@@ -125,3 +125,28 @@ struct LineInfo* parse_file(char *file_content, size_t file_size, size_t *num_li
     return lines;
 }
 
+int write_buffer_to_file(const char *filename, const char *data)
+{
+    // Open the file in write mode. Create it if it doesn't exist ("w+")
+    FILE *file = fopen(filename, "w+");
+    if (file == NULL) {
+        perror("Error opening file");
+        return -1;  // Return an error code
+    }
+
+    // Calculate the buffer size
+    size_t buffer_size = strlen(data);
+
+    // Write the buffer to the file
+    size_t written_size = fwrite(data, sizeof(char), buffer_size, file);
+    if (written_size != buffer_size) {
+        perror("Error writing to file");
+        fclose(file);
+        return -1;  // Return an error code
+    }
+
+    // Close the file
+    fclose(file);
+
+    return 0;  // Return success code
+}
