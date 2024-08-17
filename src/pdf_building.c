@@ -1,5 +1,10 @@
 #include "pdf_building.h"
 
+// Strings we write into the PDF file.
+// We _could_ replace this with something
+// other than hardcoded strings in the binary.
+const char *pdf_str_header = "%PDF-2.0\nPOOP";
+
 // Pdf creation helpers.
 // Each one writes a different object
 // to the pdf.
