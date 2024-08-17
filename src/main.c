@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "fileHandling.h"
-
+#include "file_handling.h"
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {

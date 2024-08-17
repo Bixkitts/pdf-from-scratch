@@ -12,7 +12,7 @@
     #include <unistd.h>
 #endif
 
-#include "fileHandling.h"
+#include "file_handling.h"
 
 #ifdef _WIN32
 void *memory_map_file(const char *filename, size_t *file_size)
