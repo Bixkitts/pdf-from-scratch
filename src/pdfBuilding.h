@@ -10,4 +10,4 @@ struct Pdf {
  * to hold the markdown in pdf form and
  * return a pointer to it.
  */
-struct Pdf *build_pdf_from_md(const char *md, size_t size);
+int build_pdf_from_md(const char *md, size_t size, struct Pdf *out_pdf);
