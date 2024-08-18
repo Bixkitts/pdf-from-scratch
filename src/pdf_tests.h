@@ -100,7 +100,7 @@ int obj_join_works() {
 	char* ex_obj[] = {
 			"4 0 obj\n"
 				"<<"
-				"/Length {{{leee n}}}",
+				"/Length 9",
 				"\n>>\n"
 		"stream\n",
 		"AAAAAAAAA",
