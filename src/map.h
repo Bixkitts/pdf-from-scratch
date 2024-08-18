@@ -27,15 +27,15 @@ void destroy_map (struct map *out_dict);
 /* This function copies data it             *
  * inserts.                                 */
 void  map_cpy_insert  (struct map *map,
-                       const char *key,
-                       const char *data,
+                       const char *restrict key,
+                       const char *restrict data,
                        size_t data_size);
 
 /* This function takes ownership of         *
  * the data it's passed.                    */
 void  map_mov_insert  (struct map *map,
-                       const char *key,
-                       const char *data);
+                       const char *restrict key,
+                       const char *restrict data);
 
 /* Remember to get and destroy objects      *
  * before erasing them.                     */
