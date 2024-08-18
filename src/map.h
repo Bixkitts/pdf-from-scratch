@@ -1,5 +1,9 @@
 #include <stdio.h>
 
+#define MAP_START_CAPACITY 16
+#define MAP_GROWTH_FACTOR  2
+#define MAP_SHRINK_FACTOR  2
+
 struct map_data_entry {
     char   *data;
     size_t  len;
@@ -11,16 +15,15 @@ struct map_key {
 struct map {
     struct map_data_entry *data;
     struct map_key        *keys;
+    // A bitfield showing key/data
+    // occupancy
+    char                  *occupancy;
     size_t                 count;
     // Map inserting and erasing will
     // increase or decrease the capacity
     // and reallocate accordingly
     size_t                 capacity;
 };
-
-#define MAP_START_CAPACITY 16
-#define MAP_GROWTH_FACTOR  2
-#define MAP_SHRINK_FACTOR  2
 
 // crashes on failure to allocate
 void new_map     (struct map *out_map);
