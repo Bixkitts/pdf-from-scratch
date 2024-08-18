@@ -8,10 +8,6 @@ size_t get_obj_length(const char *obj_strarr[], int len) {
 	return totalLength;
 }
 
-size_t sizeof_obj(const char *obj_strarr[]) {
-	return sizeof(obj_strarr) / sizeof(obj_strarr[0]);
-}
-
 static const char* replace_left_delim = "{{{";
 static const char* replace_right_delim = "}}}";
 
