@@ -13,3 +13,10 @@ struct pdf {
 int build_pdf_from_md (const char *md,
                        size_t md_size,
                        struct pdf *out_pdf);
+
+void write_catalog(struct pdf* out_pdf);
+void write_pages_catalog(struct pdf* out_pdf);
+void write_page_dictionary(struct pdf* out_pdf);
+void write_font_dictionary(struct pdf* out_pdf);
+void write_object_offsets(struct pdf* out_pdf);
+void write_text_stream(struct pdf* out_pdf);
