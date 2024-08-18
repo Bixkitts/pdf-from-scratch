@@ -18,11 +18,14 @@ struct map {
     size_t                 capacity;
 };
 
+#define MAP_START_CAPACITY 16
+#define MAP_GROWTH_FACTOR  2
+#define MAP_SHRINK_FACTOR  2
 
 // crashes on failure to allocate
-void new_map     (struct map *out_dict);
+void new_map     (struct map *out_map);
 
-void destroy_map (struct map *out_dict);
+void destroy_map (struct map *out_map);
 
 /* This function copies data it             *
  * inserts.                                 */
