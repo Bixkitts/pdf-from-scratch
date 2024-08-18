@@ -23,8 +23,8 @@ const char* pdf_str_pages[] =
 const char* pdf_str_page_content[] =
 { "4 0 obj\n" // %Page contents for page 1
 "<<"
-	"/Length … number of bytes in page marking operators …\n"
-">>\n"
+	"/Length {{{contentLength}}}", // TODO paste stream length here, idiot!
+"\n>>\n"
 	"stream\n",
 	/*"%This content stream writes \"Hello 32000-2 World\" and shows a number of\n"
 	"%points of interest.\n"

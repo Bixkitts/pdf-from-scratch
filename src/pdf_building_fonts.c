@@ -1,6 +1,6 @@
 #include "pdf_building.h"
 
-const char* pdf_str_font_1 =
+const char *pdf_str_font_1 =
 "5 0 obj\n" // %Font dictionary (Helvetica)
 "<<"
 "/Type /Font\n"
@@ -14,7 +14,7 @@ const char* pdf_str_font_1 =
 ">>\n"
 "endobj\n";
 
-const char* pdf_str_font_2 =
+const char *pdf_str_font_2 =
 "6 0 obj\n" // %Font dictionary (Helvetica-Oblique)
 "<<"
 "/Type /Font\n"
