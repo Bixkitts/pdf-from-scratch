@@ -54,43 +54,6 @@ const char *pdf_str_page_content[] =
 "endstream\n"
 "endobj\n" };
 
-static int ends_with(const char *str, const char *suffix, size_t str_len, size_t suffix_len) {
-	if (!str || !suffix) return 0;
-	if (suffix_len > str_len) return 0;
-	return strncmp(str + str_len - suffix_len, suffix, suffix_len) == 0;
-}
-
-static int starts_with(const char *str, const char *prefix, size_t str_len, size_t prefix_len) {
-	if (!str || !prefix) return 0;
-	if (prefix_len > str_len) return 0;
-	return strncmp(str, prefix, prefix_len) == 0;
-}
-
-static const char* ENDSTREAM = "endstream\n";
-static const char* STREAM = "stream\n";
-
-static size_t get_stream_length(const char *obj_strarr[], int len) {
-	int inStream = 0;
-	size_t totalLength = 0;
-	for (int i = 0; i < len; i++) {
-		const char* bit = obj_strarr[i];
-		if (inStream) {
-			if (starts_with(bit, ENDSTREAM, strlen(bit), sizeof(ENDSTREAM))) {
-				inStream = 0;
-			}
-			else {
-				totalLength += strlen(bit);
-			}
-		}
-		else {
-			if (ends_with(bit, STREAM, strlen(bit), sizeof(STREAM))) {
-				inStream = 1;
-			}
-		}
-	}
-	return totalLength;
-}
-
 static void write_page_dictionary(struct pdf *out_pdf);
 
 static void write_page_dictionary(struct pdf *out_pdf)

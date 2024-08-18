@@ -1,6 +1,11 @@
+#pragma once
+
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <stdio.h>
+
+#include "str_utils.h"
 
 size_t get_obj_length(const char *obj_strarr[], int len) {
 	size_t totalLength = 0;
@@ -76,6 +81,39 @@ int replace_label_in_obj(char *obj_strarr[], int len, const char *label, const c
 	return cnt;
 }
 
+size_t get_stream_length(const char* obj_strarr[], int len) {
+	static const char* ENDSTREAM = "endstream\n";
+	static const char* STREAM = "stream\n";
+	size_t total_length = 0;
+	int index_has_stream = -1;
+	int index_has_endstream = -1;
+	char* tmp = NULL;
+	for (int i = 0; i < len; i++) {
+		const char* bit = obj_strarr[i];
+		if (tmp = strstr(bit, STREAM) && index_has_stream == -1) {
+			index_has_stream = i;
+		}
+		if (tmp = strstr(bit, ENDSTREAM) && index_has_endstream == -1) {
+			index_has_endstream = i;
+		}
+	}
+	if (index_has_stream == -1 || index_has_endstream == -1) return 0;
+	if (index_has_stream > index_has_endstream) return 0;
+	if (index_has_stream == index_has_endstream) return -1; //TODO implement
+
+	const char* bit = obj_strarr[index_has_stream];
+	total_length += count_chars_after_string(bit, STREAM, strlen(bit), sizeof(STREAM) - 1);
+	printf("s %ld \n", (long)total_length);
+	for (int i = index_has_stream + 1; i < index_has_endstream; i++) {
+		const char* bit = obj_strarr[i];
+		size_t count_b = count_chars_before_string(bit, ENDSTREAM, strlen(bit));
+		total_length += count_b;
+	}
+	return total_length;
+}
+
+#define STARRLEN(starr) sizeof(starr)/sizeof(starr[0])
+
 int obj_replace_test() {
 	char* ex_obj[] = {
 		"4 0 obj\n"
@@ -87,5 +125,25 @@ int obj_replace_test() {
 	"endstream\n"
 	};
 
-	return replace_label_in_obj(ex_obj, 2, "leee n", "test") > 1;
+	return replace_label_in_obj(ex_obj, STARRLEN(ex_obj), "leee n", "test") > 1;
+}
+
+int obj_stream_len_is_9() {
+	char* ex_obj[] = {
+		"4 0 obj\n"
+			"<<"
+			"/Length {{{leee n}}}",
+			"\n>>\n"
+	"stream\n",
+	"AAAAAAAAA",
+	"endstream\n"
+	};
+	size_t slen = get_stream_length(ex_obj, STARRLEN(ex_obj));
+	printf("%ld \n", slen);
+	return slen == 9;
+}
+
+int do_pdf_utils_tests() {
+	assert(obj_replace_test());
+	assert(obj_stream_len_is_9());
 }

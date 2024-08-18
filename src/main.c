@@ -42,5 +42,5 @@ static int mmap_and_parse_file(const char* filename) {
 }
 
 static int do_tests() {
-    assert(obj_replace_test() == 1);
+    do_pdf_utils_tests();
 }
