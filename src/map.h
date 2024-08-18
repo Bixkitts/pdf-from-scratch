@@ -35,7 +35,7 @@ void  map_cpy_insert  (struct map *map,
  * the data it's passed.                    */
 void  map_mov_insert  (struct map *map,
                        const char *key,
-                       char *data);
+                       const char *data);
 
 /* Remember to get and destroy objects      *
  * before erasing them.                     */
