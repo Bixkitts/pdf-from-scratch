@@ -7,10 +7,15 @@
 
 #include "str_utils.h"
 
-size_t get_obj_length(const char *obj_strarr[], int len) {
+#define get_obj_length1(obj_strarr) get_obj_length(obj_strarr, STARRLEN(obj_strarr), NULL)
+#define get_obj_length2(obj_strarr, len) get_obj_length(obj_strarr, len, NULL)
+
+size_t get_obj_length(const char *obj_strarr[], int len, int *lengths[]) {
 	size_t totalLength = 0;
 	for (int i = 0; i < len; i++) {
-		totalLength += strlen(obj_strarr[i]);
+		size_t clen = strlen(obj_strarr[i]);
+		totalLength += clen;
+		if(lengths) lengths[i] = clen;
 	}
 	return totalLength;
 }
@@ -111,4 +116,17 @@ size_t get_stream_length(const char* obj_strarr[], int len) {
 	}
 	printf("slen %ld \n", (long)total_length);
 	return total_length;
+}
+
+size_t obj_join(char** out, const char* obj_strarr[], int len) {
+	size_t *lens = (size_t*)malloc(sizeof(size_t) * len);
+	if(lens == 0) return 0;
+	size_t obj_len = get_obj_length(obj_strarr, len, lens);
+	*out = (char*)malloc(obj_len + 1); 
+	(*out)[obj_len] = '\0';
+	for (int i = 0, rsum = 0; i < len; i++) {
+		strcpy(*out + rsum, obj_strarr[i]);
+		rsum += lens[i];
+	}
+	return obj_len;
 }
