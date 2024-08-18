@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string.h>
+#include <stdlib.h>
 
 int ends_with(const char* str, const char* suffix, size_t str_len, size_t suffix_len) {
 	if (!str || !suffix) return 0;
@@ -26,4 +27,11 @@ int count_chars_after_string(const char* str, const char* after, size_t str_len,
 	char* pos = strstr(str, after);
 	if (!pos) return str_len;
 	return pos + after_len - str - str_len;
+}
+
+
+static char idc[32];
+char* itoa_helper(int val) {
+	itoa(val, idc, 10);
+	return strdup(idc);
 }

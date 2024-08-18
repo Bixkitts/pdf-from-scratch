@@ -82,7 +82,7 @@ int replace_label_in_obj(char *obj_strarr[], int len, const char *label, const c
 }
 
 size_t get_stream_length(const char* obj_strarr[], int len) {
-	static const char* ENDSTREAM = "endstream\n";
+	static const char* ENDSTREAM = "\nendstream\n";
 	static const char* STREAM = "stream\n";
 	size_t total_length = 0;
 	int index_has_stream = -1;
@@ -103,12 +103,13 @@ size_t get_stream_length(const char* obj_strarr[], int len) {
 
 	const char* bit = obj_strarr[index_has_stream];
 	total_length += count_chars_after_string(bit, STREAM, strlen(bit), sizeof(STREAM) - 1);
-	printf("s %ld \n", (long)total_length);
+
 	for (int i = index_has_stream + 1; i < index_has_endstream; i++) {
 		const char* bit = obj_strarr[i];
 		size_t count_b = count_chars_before_string(bit, ENDSTREAM, strlen(bit));
 		total_length += count_b;
 	}
+	printf("slen %ld \n", (long)total_length);
 	return total_length;
 }
 
@@ -122,7 +123,7 @@ int obj_replace_test() {
 			"\n>>\n"
 	"stream\n",
 	"{{{leee n}}}",
-	"endstream\n"
+	"\nendstream\n"
 	};
 
 	return replace_label_in_obj(ex_obj, STARRLEN(ex_obj), "leee n", "test") > 1;
@@ -136,14 +137,38 @@ int obj_stream_len_is_9() {
 			"\n>>\n"
 	"stream\n",
 	"AAAAAAAAA",
-	"endstream\n"
+	"\nendstream\n"
 	};
 	size_t slen = get_stream_length(ex_obj, STARRLEN(ex_obj));
-	printf("%ld \n", slen);
 	return slen == 9;
 }
 
+int obj_stream_pastes_correctly() {
+	char* ex_obj[] = {
+			"4 0 obj\n"
+				"<<"
+				"/Length {{{leee n}}}",
+				"\n>>\n"
+		"stream\n",
+		"AAAAAAAAA",
+		"\nendstream\n"
+	};
+	size_t slen = get_stream_length(ex_obj, STARRLEN(ex_obj));
+	char* lenstr = itoa_helper(slen);
+	int res = replace_label_in_obj(ex_obj, STARRLEN(ex_obj), "leee n", lenstr);
+	return strcmp(ex_obj[0], "4 0 obj\n"
+				"<<"
+		"/Length 9") == 0;
+}
+
 int do_pdf_utils_tests() {
+	int p = 0;
+	int t = 3;
 	assert(obj_replace_test());
+	p++;
 	assert(obj_stream_len_is_9());
+	p++;
+	assert(obj_stream_pastes_correctly());
+	p++;
+	printf("passed %d of %d.\n", p, t);
 }

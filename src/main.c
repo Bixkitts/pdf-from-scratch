@@ -43,4 +43,7 @@ static int mmap_and_parse_file(const char* filename) {
 
 static int do_tests() {
     do_pdf_utils_tests();
+    char ch;
+    printf("Press ENTER key to Continue\n");
+    scanf("%c", &ch);
 }
