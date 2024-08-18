@@ -2,7 +2,7 @@
 
 #include <string.h>
 
-const char* pdf_str_pages[] = 
+const char *pdf_str_pages[] = 
 { "3 0 obj\n", // %Page dictionary
 "<<",
 	"/Type /Page\n"
@@ -20,7 +20,7 @@ const char* pdf_str_pages[] =
 ">>\n",
 "endobj\n" };
 
-const char* pdf_str_page_content[] =
+const char *pdf_str_page_content[] =
 { "4 0 obj\n" // %Page contents for page 1
 "<<"
 	"/Length {{{contentLength}}}", // TODO paste stream length here, idiot!
@@ -54,13 +54,13 @@ const char* pdf_str_page_content[] =
 "endstream\n"
 "endobj\n" };
 
-static int ends_with(const char* str, const char* suffix, size_t str_len, size_t suffix_len) {
+static int ends_with(const char *str, const char *suffix, size_t str_len, size_t suffix_len) {
 	if (!str || !suffix) return 0;
 	if (suffix_len > str_len) return 0;
 	return strncmp(str + str_len - suffix_len, suffix, suffix_len) == 0;
 }
 
-static int starts_with(const char* str, const char* prefix, size_t str_len, size_t prefix_len) {
+static int starts_with(const char *str, const char *prefix, size_t str_len, size_t prefix_len) {
 	if (!str || !prefix) return 0;
 	if (prefix_len > str_len) return 0;
 	return strncmp(str, prefix, prefix_len) == 0;
@@ -69,7 +69,7 @@ static int starts_with(const char* str, const char* prefix, size_t str_len, size
 static const char* ENDSTREAM = "endstream\n";
 static const char* STREAM = "stream\n";
 
-static size_t get_stream_length(const char* obj_strarr[], int len) {
+static size_t get_stream_length(const char *obj_strarr[], int len) {
 	int inStream = 0;
 	size_t totalLength = 0;
 	for (int i = 0; i < len; i++) {
@@ -91,8 +91,8 @@ static size_t get_stream_length(const char* obj_strarr[], int len) {
 	return totalLength;
 }
 
-static void write_page_dictionary(struct pdf* out_pdf);
+static void write_page_dictionary(struct pdf *out_pdf);
 
-static void write_page_dictionary(struct pdf* out_pdf)
+static void write_page_dictionary(struct pdf *out_pdf)
 {
 }
