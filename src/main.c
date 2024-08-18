@@ -3,7 +3,7 @@
 #include <assert.h>
 
 #include "file_handling.h"
-#include "pdf_utils.h"
+#include "pdf_tests.h"
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
