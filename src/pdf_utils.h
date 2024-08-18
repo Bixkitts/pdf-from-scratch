@@ -161,14 +161,14 @@ int obj_stream_pastes_correctly() {
 		"/Length 9") == 0;
 }
 
+static int p = 0;
+static int t = 0;
+static tres = 0;
+#define RUNTEST(x) tres = x(); assert(tres); p += tres; t++; 
+
 int do_pdf_utils_tests() {
-	int p = 0;
-	int t = 3;
-	assert(obj_replace_test());
-	p++;
-	assert(obj_stream_len_is_9());
-	p++;
-	assert(obj_stream_pastes_correctly());
-	p++;
+	RUNTEST(obj_replace_test);
+	RUNTEST(obj_stream_len_is_9);
+	RUNTEST(obj_stream_pastes_correctly);
 	printf("passed %d of %d.\n", p, t);
 }
