@@ -23,10 +23,11 @@ void new_map(struct map *out_map)
         exit(1);
     }
 
-    out_map->data     = mem;
-    out_map->keys     = &((struct map_key*)mem)[MAP_START_CAPACITY];
-    out_map->capacity = MAP_START_CAPACITY;
-    out_map->count    = 0;
+    out_map->data      = mem;
+    out_map->keys      = &((struct map_key*)mem)[MAP_START_CAPACITY];
+    out_map->occupancy = (char*)&((struct map_key*)mem)[MAP_START_CAPACITY * 2];
+    out_map->capacity  = MAP_START_CAPACITY;
+    out_map->count     = 0;
 }
 
 void destroy_map(struct map *out_map)
