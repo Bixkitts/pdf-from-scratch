@@ -118,7 +118,7 @@ size_t get_stream_length(const char* obj_strarr[], int len) {
 	return total_length;
 }
 
-size_t obj_join(char** out, const char* obj_strarr[], int len) {
+size_t obj_join(char **out, const char *obj_strarr[], int len) {
 	size_t *lens = (size_t*)malloc(sizeof(size_t) * len);
 	if(lens == 0) return 0;
 	size_t obj_len = get_obj_length(obj_strarr, len, lens);

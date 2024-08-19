@@ -1,12 +1,7 @@
 #pragma once
 
 #include "pdf_utils.h"
-
-#define STARRLEN(starr) sizeof(starr)/sizeof(starr[0])
-static int p = 0;
-static int t = 0;
-static int tres = 0;
-#define RUNTEST(x) {tres = x(); assert(tres); p += tres; t++;}; 
+#include "test_utils.h"
 
 int obj_length_test() {
 	char *ex_obj[] = {
@@ -100,7 +95,7 @@ int obj_join_works() {
 	char* ex_obj[] = {
 			"4 0 obj\n"
 				"<<"
-				"/Length {{{leee n}}}",
+				"/Length 9",
 				"\n>>\n"
 		"stream\n",
 		"AAAAAAAAA",
@@ -120,5 +115,4 @@ int do_pdf_utils_tests() {
 	RUNTEST(obj_lens_calculated_properly);
 	RUNTEST(obj_lens_real_example_calculated_properly);
 	RUNTEST(obj_join_works);
-	printf("passed %d of %d in %s.\n", p, t, __FILE__);
 }

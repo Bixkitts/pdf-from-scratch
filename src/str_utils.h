@@ -29,9 +29,63 @@ int count_chars_after_string(const char* str, const char* after, size_t str_len,
 	return pos + after_len - str - str_len;
 }
 
-
 static char idc[32];
 char* itoa_helper(int val) {
 	itoa(val, idc, 10);
 	return strdup(idc);
+}
+
+int strarr_cmp(char **arra, char **arrb, size_t len) {
+	for (size_t i = 0; i < len; i++) {
+		if(strcmp(arra[i], arrb[i])) return 1;
+	}
+	return 0;
+}
+
+#ifdef _WIN32
+char* strsep(char** stringp, const char* delim) {
+	char* start = *stringp;
+	char* ptr;
+	
+	if (!start) return NULL;
+	if (!*delim) {
+		ptr = start + strlen(start);
+	}
+	else {
+		ptr = strpbrk(start, delim);
+		if (!ptr) {
+			*stringp = NULL;
+			return start;
+		}
+	}
+	*ptr = '\0';
+	*stringp = ptr + 1;
+	return start;
+}
+#endif
+
+int count_for_split_str_by_whitespace(char* str, size_t str_len) {
+	int res = 0;
+	char* end = str + str_len;
+	char* sp = str;
+	while (sp != end && isspace(*sp)) sp++;
+	while (sp != end) {
+		res++;
+		while (sp != end && !isspace(*sp)) sp++;
+		while (sp != end && isspace(*sp)) sp++;
+	}
+	return res;
+}
+
+int split_string_by_whitespace(char* str, char* out[], size_t str_len, int count) {
+	int res = 0;
+	char* end = str + str_len;
+	char* sp = str;
+	while (sp != end && isspace(*sp)) sp++;
+	while (sp != end) {
+		res++;
+		while (sp != end && !isspace(*sp)) sp++;
+		while (sp != end && isspace(*sp)) sp++;
+	}
+	return res;
 }
