@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pdf_utils.h"
-#include "test_utils.h"
+#include "test_util.h"
 
 int obj_length_test() {
 	char *ex_obj[] = {
@@ -13,7 +13,7 @@ int obj_length_test() {
 	"AAAAAAAAA",
 	"\nendstream\n"
 	};
-	printf("tt %d \n", get_obj_length2(ex_obj, STARRLEN(ex_obj)));
+
 	return get_obj_length2(ex_obj, STARRLEN(ex_obj)) == 50;
 }
 
@@ -103,8 +103,13 @@ int obj_join_works() {
 	};
 	char* out;
 	obj_join(&out, ex_obj, STARRLEN(ex_obj));
-	printf(out);
-	return 1;
+	return strcmp(out, "4 0 obj\n"
+				"<<"
+		"/Length 9"
+		"\n>>\n"
+		"stream\n"
+		"AAAAAAAAA"
+		"\nendstream\n") == 0;
 }
 
 int do_pdf_utils_tests() {

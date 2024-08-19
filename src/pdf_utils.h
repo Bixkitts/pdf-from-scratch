@@ -114,7 +114,6 @@ size_t get_stream_length(const char* obj_strarr[], int len) {
 		size_t count_b = count_chars_before_string(bit, ENDSTREAM, strlen(bit));
 		total_length += count_b;
 	}
-	printf("slen %ld \n", (long)total_length);
 	return total_length;
 }
 

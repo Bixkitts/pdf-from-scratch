@@ -3,6 +3,7 @@
 #include <assert.h>
 
 #include "file_handling.h"
+
 #include "pdf_tests.h"
 #include "str_util_tests.h"
 
