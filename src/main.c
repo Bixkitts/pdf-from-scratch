@@ -6,6 +6,7 @@
 
 #include "pdf_tests.h"
 #include "str_util_tests.h"
+#include "dict_util_tests.h"
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
@@ -46,6 +47,7 @@ static int mmap_and_parse_file(const char* filename) {
 static int do_tests() {
     do_pdf_utils_tests();
     do_str_utils_tests();
+    do_dict_util_tests();
     char ch;
     printf("passed %d of %d.\n", p, t);
     printf("Press ENTER key to Continue\n");
