@@ -1,8 +1,53 @@
 #pragma once
 
+#include "defines.h"
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <ctype.h>
+
+// TODO: optimise test and verify
+void str_rev(char *str)
+{
+    int length = strlen(str);
+    for (int i = 0; i < length / 2; i++) {
+        char temp = str[i];
+        str[i] = str[length - i - 1];
+        str[length - i - 1] = temp;
+    }
+}
+
+#ifndef _WIN32
+// TODO: optimise test and verify
+char* itoa(int value, char* str, int base)
+{
+    int i = 0;
+    int is_negative = 0;
+
+    if (value == 0) {
+        str[i++] = '0';
+        str[i] = '\0';
+        return str;
+    }
+    if (value < 0 && base == 10) {
+        is_negative = 1;
+        value = -value;
+    }
+    while (value != 0) {
+        int remainder = value % base;
+        str[i++] = (remainder > 9) ? (remainder - 10) + 'a' : remainder + '0';
+        value = value / base;
+    }
+    if (is_negative) {
+        str[i++] = '-';
+    }
+    str[i] = '\0';
+    str_rev(str);
+
+    return str;
+}
+#endif
+
 
 int ends_with(const char *str, const char *suffix, size_t str_len, size_t suffix_len) {
 	if (!str || !suffix) return 0;
@@ -43,6 +88,7 @@ int strarr_cmp(char **arra, char **arrb, size_t len) {
 	return 0;
 }
 
+// TODO: Linux version
 #ifdef _WIN32
 char* strsep(char **stringp, const char *delim) {
 	char *start = *stringp;
@@ -86,9 +132,9 @@ int split_string_by_whitespace(char *str, char **out, size_t str_len, int count)
 	while (sp != end && i < count) {
 		char *sp2 = sp;
 		while (sp2 != end && !isspace((unsigned char)*sp2)) sp2++;
-		out[i] = (char*)malloc(sp2 - sp + 1);
+		out[i] = malloc(sp2 - sp + 1);
 		if(out[i] == NULL) assert(0);
-		memcpy_s(out[i], sp2 - sp, sp, sp2 - sp);
+		memcpy(out[i], sp, sp2 - sp);
 		out[i][sp2 - sp] = '\0';
 		i++;
 		sp = sp2;

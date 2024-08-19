@@ -1,7 +1,10 @@
 #pragma once
 
 #include <string.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <assert.h>
+#include <memory.h>
 #include <stdio.h>
 #ifdef _WIN32
 #include <corecrt_malloc.h>
@@ -52,29 +55,30 @@ const char *exout[] = {
 };
 
 static int is_left_dd(const char *cp) {
-	return *cp == '<' && *(cp + 1) == '<';
+   return *(uint16_t*)cp == ('<' | ('<' << 8));
 }
 static int is_right_dd(const char *cp) {
-	return *cp == '>' && *(cp + 1) == '>';
+   return *(uint16_t*)cp == ('>' | ('>' << 8));
 }
 
 int find_nested_in_dict_str(const char *str_dict, size_t str_len) {
-	const char *s_ptr = str_dict + str_len - 1;
+    if(str_len < 4) return 0;
+	const char *s_ptr = str_dict + str_len - 3;
 	const char *o_ptr = NULL;
 
 	while(s_ptr != str_dict && !is_left_dd(s_ptr)) {
 		if(is_right_dd(s_ptr)) o_ptr = s_ptr;
 		s_ptr--;
 	};
-	printf("%p %p \n", s_ptr, o_ptr);
+	printf("%p %p \n", (void*)s_ptr, (void*)o_ptr);
 	if(s_ptr == str_dict && !is_left_dd(s_ptr)) return 0;
 	if(o_ptr == NULL) return 0;
 	s_ptr += 2;
 	int out_len = o_ptr - s_ptr;
-	char* out = (char*)malloc(out_len + 1);
-	if(out == NULL) return 0;
+	char* out = malloc(out_len + 1);
+	if(!out) return 0;
 	out[out_len] = '\0';
-	memcpy_s(out, out_len, s_ptr, out_len);
+	memcpy(out, s_ptr, out_len);
 	printf("%s \n", out);
 	return 1;
 }

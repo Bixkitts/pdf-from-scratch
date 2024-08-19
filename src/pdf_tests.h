@@ -3,7 +3,7 @@
 #include "pdf_utils.h"
 #include "test_util.h"
 
-int obj_length_test() {
+int obj_length_test(void) {
 	char *ex_obj[] = {
 		"4 0 obj\n"
 			"<<"
@@ -17,7 +17,7 @@ int obj_length_test() {
 	return get_obj_length2(ex_obj, STARRLEN(ex_obj)) == 50;
 }
 
-int obj_replace_test() {
+int obj_replace_test(void) {
 	char *ex_obj[] = {
 		"4 0 obj\n"
 			"<<"
@@ -31,7 +31,7 @@ int obj_replace_test() {
 	return replace_label_in_obj(ex_obj, STARRLEN(ex_obj), "leee n", "test") > 1;
 }
 
-int obj_stream_len_is_9() {
+int obj_stream_len_is_9(void) {
 	char *ex_obj[] = {
 		"4 0 obj\n"
 			"<<"
@@ -45,7 +45,7 @@ int obj_stream_len_is_9() {
 	return slen == 9;
 }
 
-int obj_stream_pastes_correctly() {
+int obj_stream_pastes_correctly(void) {
 	char *ex_obj[] = {
 			"4 0 obj\n"
 				"<<"
@@ -63,7 +63,7 @@ int obj_stream_pastes_correctly() {
 		"/Length 9") == 0;
 }
 
-int obj_lens_calculated_properly() {
+int obj_lens_calculated_properly(void) {
 	char* ex_arr[] = {
 		"a",
 		"b",
@@ -75,7 +75,7 @@ int obj_lens_calculated_properly() {
 	return lens[0] == 1 && lens[1] == 1 && lens[2] == 1;
 }
 
-int obj_lens_real_example_calculated_properly() {
+int obj_lens_real_example_calculated_properly(void) {
 	char* ex_obj[] = {
 			"4 0 obj\n"
 				"<<"
@@ -91,7 +91,7 @@ int obj_lens_real_example_calculated_properly() {
 	return lens[3] == 11;
 }
 
-int obj_join_works() {
+int obj_join_works(void) {
 	char* ex_obj[] = {
 			"4 0 obj\n"
 				"<<"
@@ -112,7 +112,7 @@ int obj_join_works() {
 		"\nendstream\n") == 0;
 }
 
-int do_pdf_utils_tests() {
+int do_pdf_utils_tests(void) {
 	RUNTEST(obj_replace_test);
 	RUNTEST(obj_stream_len_is_9);
 	RUNTEST(obj_stream_pastes_correctly);

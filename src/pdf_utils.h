@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
+#include "defines.h"
 #include "str_utils.h"
 
 #define get_obj_length1(obj_strarr) get_obj_length(obj_strarr, STARRLEN(obj_strarr), NULL)
@@ -15,7 +17,7 @@ size_t get_obj_length(const char *obj_strarr[], int len, int *lengths[]) {
 	for (int i = 0; i < len; i++) {
 		size_t clen = strlen(obj_strarr[i]);
 		totalLength += clen;
-		if(lengths) lengths[i] = clen;
+		if(lengths) lengths[i] = (int*)clen;
 	}
 	return totalLength;
 }
@@ -95,10 +97,10 @@ size_t get_stream_length(const char* obj_strarr[], int len) {
 	char* tmp = NULL;
 	for (int i = 0; i < len; i++) {
 		const char* bit = obj_strarr[i];
-		if (tmp = strstr(bit, STREAM) && index_has_stream == -1) {
+		if ((tmp = strstr(bit, STREAM)) && index_has_stream == -1) {
 			index_has_stream = i;
 		}
-		if (tmp = strstr(bit, ENDSTREAM) && index_has_endstream == -1) {
+		if ((tmp = strstr(bit, ENDSTREAM)) && index_has_endstream == -1) {
 			index_has_endstream = i;
 		}
 	}
@@ -118,10 +120,10 @@ size_t get_stream_length(const char* obj_strarr[], int len) {
 }
 
 size_t obj_join(char **out, const char *obj_strarr[], int len) {
-	size_t *lens = (size_t*)malloc(sizeof(size_t) * len);
+	size_t *lens = malloc(sizeof(size_t) * len);
 	if(lens == 0) return 0;
-	size_t obj_len = get_obj_length(obj_strarr, len, lens);
-	*out = (char*)malloc(obj_len + 1); 
+	size_t obj_len = get_obj_length(obj_strarr, len, (int**)lens);
+	*out = malloc(obj_len + 1); 
 	(*out)[obj_len] = '\0';
 	for (int i = 0, rsum = 0; i < len; i++) {
 		strcpy(*out + rsum, obj_strarr[i]);

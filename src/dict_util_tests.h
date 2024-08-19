@@ -1,7 +1,10 @@
 #pragma once
 
+#include <string.h>
+
 #include "test_util.h"
 #include "dict_util.h"
+#include "defines.h"
 
 int test_str_dict_to_arr() {
 	char** out;
