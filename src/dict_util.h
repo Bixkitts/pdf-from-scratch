@@ -4,33 +4,33 @@
 #include <assert.h>
 #include <stdio.h>
 
-const char *ex_dict = "<</Type / Example"
-"/Subtype /DictionaryExample"
-"/Version 0.01"
-"/IntegerItem 12"
-"/StringItem(a string)"
-"/Subdictionary"
+const char *ex_dict = "<</Type /Example\n"
+"/Subtype /DictionaryExample\n"
+"/Version <<>>\n"
+"/IntegerItem 12\n"
+"/StringItem (a string)\n"
+"/Subdictionary "
 	"<<"
-"/Item1 0.4"
-"/Item2 true"
-"/LastItem (not !)"
-"/VeryLastItem (OK)"
+"/Item1 0.4\n"
+"/Item2 true\n"
+"/LastItem (not !)\n"
+"/VeryLastItem (OK)\n"
 	">>"
 ">>";
 
-const char *out_dict = "<</Type / Example"
-"/Subtype /DictionaryExample"
-"/Version 0.01"
-"/IntegerItem 12"
-"/StringItem(a string)"
-"/Subdictionary"
-"{{{tagXX}}} r"
-">>"
-"{{{tagXX}}} obj"
-"<<"
-"/Item1 0.4"
-"/Item2 true"
-"/LastItem (not !)"
+const char *out_dict = "<</Type / Example\n"
+"/Subtype /DictionaryExample\n"
+"/Version <<>>\n"
+"/IntegerItem 12\n"
+"/StringItem (a string)\n"
+"/Subdictionary "
+"{{{tagXX}}} r\n"
+">>\n"
+"{{{tagXX}}} obj\n"
+"<<\n"
+"/Item1 0.4\n"
+"/Item2 true\n"
+"/LastItem (not !)\n"
 "/VeryLastItem (OK)"
 ">>";
 
@@ -41,38 +41,36 @@ const char *ex_dict2 = "<<"
 "/VeryLastItem (OK)"
 ">>";
 
-const char *exout[][2] = {
-{"/Item1","0.4"},
-{"/Item2","true"},
-{"/LastItem","(not !)"},
-{"/VeryLastItem","(OK)"}
+const char *exout[] = {
+"/Item1","0.4",
+"/Item2","true",
+"/LastItem","(not !)",
+"/VeryLastItem","(OK)"
 };
+
+static int is_left_dd(char* cp) {
+	return *cp == '<' && *(cp + 1) == '<';
+}
+static int is_right_dd(char* cp) {
+	return *cp == '>' && *(cp + 1) == '>';
+}
+
+int find_nested_in_dict_str(const char* str_dict) {
+	const char* s_ptr = str_dict;
+	char* o_ptr;
+}
 
 int str_dict_to_arr(char* str_dict, char** out) {
 	size_t dict_len = strlen(str_dict);
 	char* begin = &str_dict[2];
+	int cnt = 0;
 	while (*(begin - 1) != '<' && *(begin - 2) != '<') begin++;
 	
 	char* end = strstr(begin, ">>");
-	if (!end) return 0;
-	
-}
+	if (!end) end = str_dict + dict_len;
+	char* sp = strstr(begin, " ");
+	char* nl = strstr(begin, "\n");
+	if(!sp) return 0;
 
-int test_str_dict_to_arr() {
-	char** out;
-	int items = str_dict_to_arr(strdup(ex_dict2), out);
-	for (int i = 0; i < items; i++) {
-		printf("%s \n", out[i]);
-	}
-	return 1;
-}
-
-#define STARRLEN(starr) sizeof(starr)/sizeof(starr[0])
-static int p = 0;
-static int t = 0;
-static int tres = 0;
-#define RUNTEST(x) {tres = x(); assert(tres); p += tres; t++;}; 
-
-int do_dict_util_tests() {
-	RUNTEST(test_str_dict_to_arr);
+	return cnt;
 }
