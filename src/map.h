@@ -12,17 +12,14 @@ struct map_key {
     char   *string;
     size_t  len;
 };
-struct map {
+struct __attribute__((packed)) map {
     struct map_data_entry *data;
     struct map_key        *keys;
-    // A bitfield showing key/data
-    // occupancy
-    char                  *occupancy;
-    size_t                 count;
+    long long              count;
     // Map inserting and erasing will
     // increase or decrease the capacity
     // and reallocate accordingly
-    size_t                 capacity;
+    long long              capacity;
 };
 
 // crashes on failure to allocate
@@ -33,23 +30,24 @@ void destroy_map (struct map *out_map);
 /* This function copies data it             *
  * inserts.                                 */
 void  map_cpy_insert  (struct map *map,
-                       const char *restrict key,
+                       const struct map_key *in_key,
                        const char *restrict data,
                        size_t data_size);
 
 /* This function takes ownership of         *
  * the data it's passed.                    */
 void  map_mov_insert  (struct map *map,
-                       const char *restrict key,
-                       const char *restrict data);
+                       const struct map_key *in_key,
+                       char *data,
+                       size_t data_size);
 
 /* Remember to get and destroy objects      *
  * before erasing them.                     */
 void  map_erase       (struct map *map,
-                       const char *key);
+                       const char *in_key);
 
 /* Returns NULL if an object corresponding  *
  * to a key was not found, otherwise        *
  * returns the object.                      */
-void *map_get         (const struct map *map,
-                       const char *key);
+struct map_data_entry *map_get (const struct map *map,
+                                const struct map_key *in_key);
