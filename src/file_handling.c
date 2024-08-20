@@ -45,7 +45,7 @@ void *memory_map_file(const char *filename, size_t *file_size)
     return file_content;
 }
 
-void unmap_file(void *file_content, size_t file_size)
+void unmap_file(void *file_content)
 {
     UnmapViewOfFile(file_content);
 }
@@ -88,7 +88,7 @@ void unmap_file(void *file_content, size_t file_size)
 // Function to read file contents and find lines starting with '#'
 struct LineInfo* parse_file(char *file_content, size_t file_size, size_t *num_lines)
 {
-    size_t capacity = 10; // Initial capacity for struct LineInfo array
+    size_t capacity = 10; 
     struct LineInfo *lines = malloc(capacity * sizeof(*lines));
     if (!lines) {
         perror("Failed to allocate memory");
@@ -101,17 +101,20 @@ struct LineInfo* parse_file(char *file_content, size_t file_size, size_t *num_li
         if (file_content[i] == '\n' || i == file_size - 1) {
             size_t line_length = &file_content[i] - line_start + 1;
 
-            // Check if the line starts with '#'
             if (line_start[0] == '#') {
                 if (*num_lines >= capacity) {
                     capacity *= 2;
-                    lines = realloc(lines, capacity * sizeof(*lines));
-                    if (!lines) {
+                    struct LineInfo *temp = realloc(lines, capacity * sizeof(*lines));
+                    if(temp == NULL) {
+                        free(lines);
                         perror("Failed to reallocate memory");
                         exit(EXIT_FAILURE);
                     }
+                    else {
+                        lines = temp;
+                    }
                 }
-
+                
                 lines[*num_lines].line_index = line_index;
                 lines[*num_lines].line_length = line_length;
                 (*num_lines)++;
@@ -127,26 +130,22 @@ struct LineInfo* parse_file(char *file_content, size_t file_size, size_t *num_li
 
 int write_buffer_to_file(const char *filename, const char *data)
 {
-    // Open the file in write mode. Create it if it doesn't exist ("w+")
     FILE *file = fopen(filename, "w+");
     if (file == NULL) {
         perror("Error opening file");
-        return -1;  // Return an error code
+        return -1;
     }
 
-    // Calculate the buffer size
     size_t buffer_size = strlen(data);
 
-    // Write the buffer to the file
     size_t written_size = fwrite(data, sizeof(char), buffer_size, file);
     if (written_size != buffer_size) {
         perror("Error writing to file");
         fclose(file);
-        return -1;  // Return an error code
+        return -1;
     }
 
-    // Close the file
     fclose(file);
 
-    return 0;  // Return success code
+    return 0;
 }

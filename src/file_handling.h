@@ -16,8 +16,7 @@ struct LineInfo {
 
 void            *memory_map_file    (const char *filename,
                                      size_t *file_size);
-void             unmap_file         (void *file_content,
-                                     size_t file_size);
+void             unmap_file         (void *file_content);
 struct LineInfo *parse_file         (char *file_content,
                                      size_t file_size,
                                      size_t *num_lines);

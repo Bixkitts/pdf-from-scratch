@@ -5,27 +5,24 @@
 #include "test_util.h"
 #include <stdio.h>
 
-int test_count_for_split_str_by_whitespace() {
+int test_count_for_split_str_by_whitespace(void) {
 	const char* test_str = "a    b c d   e\n f\t\n\v g";
 	int res = count_for_split_str_by_whitespace(strdup(test_str), strlen(test_str));
 
 	return res == 7;
 }
 
-int test_split_string_by_whitespace() {
-	const char* test_str = "a    b c d   e\n f\t\n\v g";
+int test_split_string_by_whitespace(void) {
+	char* test_str = strdup("a    b c d   e\n f\t\n\v g");
 	int cnt = count_for_split_str_by_whitespace(strdup(test_str), strlen(test_str));
 	char **strs = (char**)malloc(sizeof(char*) * cnt);
 	if(strs == NULL) assert(0);
 	
-	int res = split_string_by_whitespace(test_str, strs, strlen(test_str), cnt);
-	for (int i = 0; i < cnt; i++) {
-		printf("%s \n", strs[i]);
-	}
+	split_string_by_whitespace(test_str, strs, strlen(test_str), cnt);
 	return strcmp(strs[6], "g") == 0;
 }
 
-int do_str_utils_tests() {
+void do_str_utils_tests(void) {
 	RUNTEST(test_count_for_split_str_by_whitespace);
 	RUNTEST(test_split_string_by_whitespace);
 }

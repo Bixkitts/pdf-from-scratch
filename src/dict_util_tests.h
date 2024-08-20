@@ -6,16 +6,23 @@
 #include "dict_util.h"
 #include "defines.h"
 
-int test_str_dict_to_arr() {
-	char** out;
-	int items = str_dict_to_arr(strdup(ex_dict2), out);
+int test_str_dict_to_arr(void) {
+	const char* ex_dict2 = "<<"
+		"/Item1 0.4"
+		"/Item2 true"
+		"/LastItem (not !)"
+		"/VeryLastItem (OK)"
+		">>";
+
+	char** out = NULL;
+	int items = str_dict_to_arr(_strdup(ex_dict2), out);
 	for (int i = 0; i < items; i++) {
 		printf("%s \n", out[i]);
 	}
 	return 1;
 }
 
-int test_find_nested_in_dict_str() {
+int test_find_nested_in_dict_str(void) {
 	const char* out_dict = "<</Type / Example\n"
 		"/Subtype /DictionaryExample\n"
 		"/Version <<>>\n"
@@ -31,11 +38,11 @@ int test_find_nested_in_dict_str() {
 		"/LastItem (not !)\n"
 		"/VeryLastItem (OK)"
 		">>>>>>>>>>>>>>>>>>>";
-	int res = find_nested_in_dict_str(out_dict, strlen(out_dict));
+	find_nested_in_dict_str(out_dict, strlen(out_dict));
 	return 1;
 }
 
-int do_dict_util_tests() {
+void do_dict_util_tests(void) {
 	RUNTEST(test_str_dict_to_arr);
 	RUNTEST(test_find_nested_in_dict_str);
 }

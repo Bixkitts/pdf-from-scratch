@@ -1,9 +1,10 @@
 #pragma once
 
-#define SOFT_FAIL
+#include <stdio.h>
+
 #ifdef SOFT_FAIL
-	void iassert(int a) {}
-#elif
+	void iassert(int a) { if(a == 0) printf("assertion failure :(\n"); }
+#else
 #define iassert(a) assert(a)
 #endif
 

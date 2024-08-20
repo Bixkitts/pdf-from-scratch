@@ -8,6 +8,19 @@
 #include "str_util_tests.h"
 #include "dict_util_tests.h"
 
+static void mmap_and_parse_file(const char* filename);
+
+static void do_tests(void) {
+    do_pdf_utils_tests();
+    do_str_utils_tests();
+    do_dict_util_tests();
+    char ch;
+    printf("passed %d of %d.\n", p, t);
+    printf("Press ENTER key to Continue\n");
+    int i = scanf("%c", &ch);
+    i++;
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
@@ -24,7 +37,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-static int mmap_and_parse_file(const char* filename) {
+static void mmap_and_parse_file(const char* filename) {
     size_t file_size;
     char* file_content = memory_map_file(filename, &file_size);
     if (!file_content) {
@@ -41,15 +54,5 @@ static int mmap_and_parse_file(const char* filename) {
     }
 
     free(lines);
-    unmap_file(file_content, file_size);
-}
-
-static int do_tests() {
-    do_pdf_utils_tests();
-    do_str_utils_tests();
-    do_dict_util_tests();
-    char ch;
-    printf("passed %d of %d.\n", p, t);
-    printf("Press ENTER key to Continue\n");
-    scanf("%c", &ch);
+    unmap_file(file_content);
 }

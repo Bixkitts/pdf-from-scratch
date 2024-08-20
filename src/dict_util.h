@@ -9,7 +9,7 @@
 #ifdef _WIN32
 #include <corecrt_malloc.h>
 #endif
-
+/*
 const char *ex_dict = "<</Type /Example\n"
 "/Subtype /DictionaryExample\n"
 "/Version <<>>\n"
@@ -53,7 +53,7 @@ const char *exout[] = {
 "/LastItem","(not !)",
 "/VeryLastItem","(OK)"
 };
-
+*/
 static int is_left_dd(const char *cp) {
    return *(uint16_t*)cp == ('<' | ('<' << 8));
 }
@@ -74,7 +74,7 @@ int find_nested_in_dict_str(const char *str_dict, size_t str_len) {
 	if(s_ptr == str_dict && !is_left_dd(s_ptr)) return 0;
 	if(o_ptr == NULL) return 0;
 	s_ptr += 2;
-	int out_len = o_ptr - s_ptr;
+	size_t out_len = o_ptr - s_ptr;
 	char* out = malloc(out_len + 1);
 	if(!out) return 0;
 	out[out_len] = '\0';

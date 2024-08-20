@@ -1,6 +1,6 @@
 #pragma once
 
-#include "defines.h"
+//#include "defines.h"
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -9,8 +9,8 @@
 // TODO: optimise test and verify
 void str_rev(char *str)
 {
-    int length = strlen(str);
-    for (int i = 0; i < length / 2; i++) {
+    size_t length = strlen(str);
+    for (size_t i = 0; i < length / 2; i++) {
         char temp = str[i];
         str[i] = str[length - i - 1];
         str[length - i - 1] = temp;
@@ -61,14 +61,14 @@ int starts_with(const char *str, const char *prefix, size_t str_len, size_t pref
 	return strncmp(str, prefix, prefix_len) == 0;
 }
 
-int count_chars_before_string(const char *str, const char *before, size_t str_len) {
+size_t count_chars_before_string(const char *str, const char *before, size_t str_len) {
 	if (!before) return str_len;
 	char* pos = strstr(str, before);
 	if(!pos) return str_len;
 	return pos - str;
 }
 
-int count_chars_after_string(const char *str, const char *after, size_t str_len, size_t after_len) {
+size_t count_chars_after_string(const char *str, const char *after, size_t str_len, size_t after_len) {
 	if (!after) return str_len;
 	char *pos = strstr(str, after);
 	if (!pos) return str_len;
@@ -77,8 +77,8 @@ int count_chars_after_string(const char *str, const char *after, size_t str_len,
 
 static char idc[32];
 char *itoa_helper(int val) {
-	itoa(val, idc, 10);
-	return strdup(idc);
+	_itoa_s(val, idc, 32, 10);
+	return _strdup(idc);
 }
 
 int strarr_cmp(char **arra, char **arrb, size_t len) {

@@ -52,7 +52,7 @@ static void write_object_offsets  (struct pdf *out_pdf);
 static void write_text_stream     (struct pdf *out_pdf);
 
 // return the size of the pdf and -1 on error
-int build_pdf_from_md(const char *md,
+size_t build_pdf_from_md(const char *md,
                       size_t md_size,
                       struct pdf *out_pdf)
 {
