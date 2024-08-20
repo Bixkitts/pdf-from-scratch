@@ -1,8 +1,8 @@
 CC          = gcc
 CFLAGS      = -Wall -Wextra -pedantic -std=c99
 SRCS        = src/*.c
-TARGET      = md_parser
 BUILD_DIR   = build
+TARGET      = $(BUILD_DIR)/md_parser
 DEBUG_FLAGS = -g -O0
 PROD_FLAGS  = -O2
 
@@ -19,6 +19,9 @@ prod: $(TARGET)
 
 $(TARGET): $(SRCS)
 	$(CC) $(CFLAGS) -o $(TARGET) $(SRCS)
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
 
 clean:
 	rm -f $(TARGET)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "defines.h"
 #include "str_utils.h"
 #include "test_util.h"
 #include <stdio.h>
