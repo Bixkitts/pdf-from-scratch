@@ -15,10 +15,15 @@ struct map_key {
     char   *string;
     size_t  len;
 };
+
 struct __attribute__((packed)) map {
     struct map_data_entry *data;
     struct map_key        *keys;
-    // Contiguous 32 byte key strings
+    // A block of memory for short
+    // strings (MAP_SMALL_STR_SIZE)
+    // so they are contiguous
+    // and can be eaten by search
+    // algos
     char                  *short_key_store;
     long long              count;
     // Map inserting and erasing will
@@ -49,7 +54,7 @@ void  map_mov_insert  (struct map *map,
 /* Remember to get and destroy objects      *
  * before erasing them.                     */
 void  map_erase       (struct map *map,
-                       const char *in_key);
+                       const struct map_key *in_key);
 
 /* Returns NULL if an object corresponding  *
  * to a key was not found, otherwise        *

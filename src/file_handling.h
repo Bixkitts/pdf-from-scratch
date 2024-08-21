@@ -21,6 +21,6 @@ struct line_info *parse_file         (char *file_content,
                                       size_t *num_lines);
 int               write_data_to_file (const char *filename,
                                       const char *data);
-void             unmap_file          (void *file_content,
-                                      size_t file_size);
+void              unmap_file          (void *file_content,
+                                       size_t file_size);
 
