@@ -3,6 +3,9 @@
 #include <assert.h>
 #include "defines.h"
 #include <string.h>
+#include <immintrin.h>
+#include <stdint.h>
+#include <stddef.h>
 
 #include "map.h"
 
@@ -16,11 +19,56 @@ static long long map_get_empty_slot(const struct map *map)
     return -1;
 }
 
-// TODO: optimise af.
-// Make the strings contiguous and not alloc!!!!!
+/* AVX 2 function to find 32 byte chunk    *
+ * of data in an array of 32 byte chunks.  *
+ * The array MUST be 32 byte aligned       *
+ * for this to work at all,                *
+ * and MUST have 32 byte elements.         *
+ *                                         *
+ * The chunk being searched for MUST       *
+ * also be 32 byte aligned.                *
+ *                                         *
+ * TODO: This could be a helper function   *
+ *       independant of the map            */
+static int find_32byte_chunk(const char* array,
+                             size_t array_len,
+                             const char* chunk) {
+    // TODO: not tested
+    size_t array_size = array_len * 32;
+    __m256i chunk_vector = _mm256_load_si256((const __m256i*)chunk);
+
+    for (size_t i = 0; i <= array_size; i += 32) {
+        __m256i array_vector = _mm256_load_si256((const __m256i*)(array + i));
+
+        // Compare the 32-byte chunks
+        __m256i result = _mm256_cmpeq_epi8(array_vector, chunk_vector);
+
+        // Check if all bytes in the result are 0xFF (meaning a full match)
+        if (_mm256_movemask_epi8(result) == -1) {
+            return (int)i;  // Found a match, return the index
+        }
+    }
+
+    return -1;  // No match found
+}
+
 static long long map_find_key(const struct map *map,
                               const struct map_key *restrict in_key)
 {
+    if(in_key->len <= 32) {
+        // Fast search
+        alignas(32) char tmp[32] = {};
+        memcpy(tmp, in_key->string, in_key->len);
+        int res = find_32byte_chunk(map->short_key_store,
+                                    map->capacity,
+                                    tmp);
+        if(res >= 0) {
+            return res;
+        }
+    }
+    // Slow search (falls back to this)
+    // Should still be very fast
+    // because we skip unequal string lengths.
     for(long long i = 0; i < map->capacity; i++) {
         const struct map_key *key = &map->keys[i];
         if(key->len != in_key->len) {
@@ -67,9 +115,10 @@ static void map_grow(struct map *out_map)
     out_map->capacity *= MAP_GROWTH_FACTOR;
 }
 
-/* We know if any string is in our     *
+/* THIS IS NOT A SEARCH FUNCTION.      *
+ * We know if any string is in our     *
  * map short_key_store if it's memory  *
- * address falls within the block      */
+ * address falls within the block.     */
 static bool is_string_in_key_store(const struct map *map,
                                    const char *string)
 {
@@ -126,13 +175,21 @@ void destroy_map(struct map *out_map)
     // Remember to free
 }
 
-static void map_store_key(struct map *out_map,
-                          long long slot,                   
-                          const struct map_key *in_key)
+/* Stores a key in the map at the given *
+ * slot if it is empty, otherwise does  *
+ * nothing. We should never write over  *
+ * an occupied key in the map           */
+static void map_try_store_key(struct map *out_map,
+                              long long slot,                   
+                              const struct map_key *in_key)
 {
+    if (out_map->keys[slot].string) {
+        return;
+    }
     if(in_key->len <= MAP_SMALL_STR_SIZE) {
         memcpy(out_map->keys[slot].string, in_key->string, in_key->len);
     }
+    out_map->keys[slot].len    = in_key->len;
     out_map->keys[slot].string = malloc(in_key->len);
     if(!out_map->keys[slot].string) {
         exit(1);
@@ -158,13 +215,7 @@ void map_cpy_insert(struct map *out_map,
     }
     out_map->count++;
     out_map->data[slot].len = data_size;
-    // Copy in the string data from the search key
-    // if we're inserting to an empty slot.
-    // TODO: Not optimal, we do this IF() in the
-    // map_get_slot_from_key() function already.
-    if (!out_map->keys[slot].string) {
-
-    }
+    map_try_store_key(out_map, slot, in_key);
     char *dest = out_map->data[slot].data;
     dest = malloc(data_size);
     if(!dest) {
@@ -188,24 +239,14 @@ void map_mov_insert(struct map *out_map,
                         data,
                         data_size);
     }
-    // Copy in the string data from the search key
-    // if we're inserting to an empty slot.
-    // TODO: Not optimal, we do this IF() in the
-    // map_get_slot_from_key() function already.
-    if (!out_map->keys[slot].string) {
-        out_map->keys[slot].string = malloc(in_key->len);
-        if(!out_map->keys[slot].string) {
-            exit(1);
-        }
-        memcpy(out_map->keys[slot].string, in_key->string, in_key->len);
-    }
+    map_try_store_key(out_map, slot, in_key);
     out_map->count++;
     out_map->data[slot].len  = data_size;
     out_map->data[slot].data = data;
 }
 
-void map_erase(struct map *map,
-               const struct map_key *key)
+void map_erase(struct map *out_map,
+               const struct map_key *in_key)
 {
 }
 

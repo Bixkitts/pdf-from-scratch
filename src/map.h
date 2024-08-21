@@ -39,25 +39,25 @@ void destroy_map (struct map *out_map);
 
 /* This function copies data it             *
  * inserts.                                 */
-void  map_cpy_insert  (struct map *map,
+void  map_cpy_insert  (struct map *out_map,
                        const struct map_key *in_key,
                        const char *restrict data,
                        size_t data_size);
 
 /* This function takes ownership of         *
  * the data it's passed.                    */
-void  map_mov_insert  (struct map *map,
+void  map_mov_insert  (struct map *out_map,
                        const struct map_key *in_key,
                        char *data,
                        size_t data_size);
 
 /* Remember to get and destroy objects      *
  * before erasing them.                     */
-void  map_erase       (struct map *map,
+void  map_erase       (struct map *out_map,
                        const struct map_key *in_key);
 
 /* Returns NULL if an object corresponding  *
  * to a key was not found, otherwise        *
  * returns the object.                      */
-struct map_data_entry *map_get (const struct map *map,
+struct map_data_entry *map_get (const struct map *out_map,
                                 const struct map_key *in_key);
