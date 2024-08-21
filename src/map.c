@@ -106,8 +106,9 @@ static long long map_get_slot_from_key(const struct map *in_map,
 static void map_grow(struct map *out_map)
 {
     assert(sizeof(*out_map->data) == sizeof(*out_map->keys));
-    const size_t data_keys_size       = out_map->capacity * 2
+    const size_t data_size            = out_map->capacity
                                         * sizeof(*out_map->data);
+    const size_t data_keys_size       = data_size * 2;    
     const size_t short_key_store_size = out_map->capacity * MAP_SMALL_STR_SIZE;
     const size_t current_size         = data_keys_size + short_key_store_size;
     const size_t total_alloc          = MAP_GROWTH_FACTOR * current_size;
@@ -119,7 +120,15 @@ static void map_grow(struct map *out_map)
     // We need to zero it because of
     // 256 bit string comparisons
     memset (new_mem, 0, total_alloc);
-    memcpy (new_mem, out_map->data, current_size);
+    memcpy (new_mem,
+            out_map->data,
+            data_size);
+    memcpy ((char*)new_mem + data_size,
+            out_map->keys,
+            data_size);
+    memcpy ((char*)new_mem + data_keys_size,
+            out_map->short_key_store,
+            data_size);
     free   (out_map->data);
     out_map->data = new_mem;
     out_map->capacity *= MAP_GROWTH_FACTOR;

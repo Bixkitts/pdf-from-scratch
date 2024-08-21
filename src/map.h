@@ -15,7 +15,18 @@ struct map_key {
     char   *string;
     size_t  len;
 };
-
+// TODO:
+// Could mb do smthn like this,
+// because the map member
+// "data" points to allocated
+// memory pool for the whole
+// struct:
+//
+// union map_data {
+//     struct map_data_entry *data;
+//     void *memory;
+// };
+//
 struct __attribute__((packed)) map {
     struct map_data_entry *data;
     struct map_key        *keys;
