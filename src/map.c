@@ -111,22 +111,17 @@ void destroy_map(struct map *out_map)
     if (!out_map->data) {
         return;
     }
+    for (int i = 0; i < out_map->capacity; i++) {
+        // Strings smaller than 33 bytes
+        // are copied into a contiguous key store
+        // larger ones are allocated
+        if(!is_string_in_key_store(out_map, out_map->keys[i].string)) {
+            free(out_map->keys[i].string);
+        }
+    }
     // We only have one allocation;
     // consult new_map()
     free   (out_map->data);
-    for (int i = 0; i < out_map->capacity; i++) {
-        if(out_map->keys[i].string < out_map->short_key_store
-           || out_map->keys[i].string > out_map->short_key_store
-              + out_map->capacity * MAP_SMALL_STR_SIZE * sizeof(char))
-        {
-            // Strings smaller than 33 bytes
-            // are copied into a contiguous key store
-            // larger ones are allocated
-            if(!is_string_in_key_store(out_map, out_map->keys[i].string)) {
-                free(out_map->keys[i].string);
-            }
-        }
-    }
     memset (out_map, 0, sizeof(*out_map));
     // Remember to free
 }
