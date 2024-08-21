@@ -45,7 +45,7 @@ void *memory_map_file(const char *filename, size_t *file_size)
     return file_content;
 }
 
-void unmap_file(void *file_content)
+void unmap_file(void *file_content, size_t file_size)
 {
     UnmapViewOfFile(file_content);
 }
@@ -86,10 +86,10 @@ void unmap_file(void *file_content, size_t file_size)
 #endif
 
 // Function to read file contents and find lines starting with '#'
-struct LineInfo* parse_file(char *file_content, size_t file_size, size_t *num_lines)
+struct line_info* parse_file(char *file_content, size_t file_size, size_t *num_lines)
 {
     size_t capacity = 10; 
-    struct LineInfo *lines = malloc(capacity * sizeof(*lines));
+    struct line_info *lines = malloc(capacity * sizeof(*lines));
     if (!lines) {
         perror("Failed to allocate memory");
         exit(EXIT_FAILURE);
@@ -104,7 +104,7 @@ struct LineInfo* parse_file(char *file_content, size_t file_size, size_t *num_li
             if (line_start[0] == '#') {
                 if (*num_lines >= capacity) {
                     capacity *= 2;
-                    struct LineInfo *temp = realloc(lines, capacity * sizeof(*lines));
+                    struct line_info *temp = realloc(lines, capacity * sizeof(*lines));
                     if(temp == NULL) {
                         free(lines);
                         perror("Failed to reallocate memory");

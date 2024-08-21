@@ -9,16 +9,18 @@
 /* Indexes to lines beginning with '#'
  * and their length
  */
-struct LineInfo {
+struct line_info {
     size_t line_index;
     size_t line_length;
 };
 
-void            *memory_map_file    (const char *filename,
-                                     size_t *file_size);
-void             unmap_file         (void *file_content);
-struct LineInfo *parse_file         (char *file_content,
-                                     size_t file_size,
-                                     size_t *num_lines);
-int              write_data_to_file (const char *filename,
-                                     const char *data);
+void             *memory_map_file    (const char *filename,
+                                      size_t *file_size);
+struct line_info *parse_file         (char *file_content,
+                                      size_t file_size,
+                                      size_t *num_lines);
+int               write_data_to_file (const char *filename,
+                                      const char *data);
+void             unmap_file          (void *file_content,
+                                      size_t file_size);
+

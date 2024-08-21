@@ -78,7 +78,7 @@ size_t count_chars_after_string(const char *str, const char *after, size_t str_l
 static char idc[32];
 char *itoa_helper(int val) {
 	_itoa_s(val, idc, 32, 10);
-	return _strdup(idc);
+	return strdup(idc);
 }
 
 int strarr_cmp(char **arra, char **arrb, size_t len) {

@@ -106,7 +106,7 @@ int obj_join_works(void) {
 		"\nendstream\n"
 	};
 	char* out;
-	obj_join(&out, ex_obj, STARRLEN(ex_obj));
+	obj_join(&out, (const char **)ex_obj, STARRLEN(ex_obj));
 	return strcmp(out, "4 0 obj\n"
 				"<<"
 		"/Length 9"

@@ -1,5 +1,5 @@
 CC          = gcc
-CFLAGS      = -Wall -Wextra -pedantic -std=c99
+CFLAGS      = -Wall -Wextra -pedantic -std=c2x
 SRCS        = src/*.c
 BUILD_DIR   = build
 TARGET      = $(BUILD_DIR)/md_parser

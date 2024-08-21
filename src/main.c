@@ -45,7 +45,7 @@ static void mmap_and_parse_file(const char* filename) {
     }
 
     size_t num_lines = 0;
-    struct LineInfo* lines = parse_file(file_content, file_size, &num_lines);
+    struct line_info* lines = parse_file(file_content, file_size, &num_lines);
 
     printf("Found %zu lines starting with '#':\n", num_lines);
     for (size_t i = 0; i < num_lines; i++) {
@@ -54,5 +54,5 @@ static void mmap_and_parse_file(const char* filename) {
     }
 
     free(lines);
-    unmap_file(file_content);
+    unmap_file(file_content, file_size);
 }

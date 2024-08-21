@@ -1,8 +1,11 @@
+#pragma once
+
 #include <stdio.h>
 
 #define MAP_START_CAPACITY 16
 #define MAP_GROWTH_FACTOR  2
 #define MAP_SHRINK_FACTOR  2
+#define MAP_SMALL_STR_SIZE 32
 
 struct map_data_entry {
     char   *data;
@@ -15,6 +18,8 @@ struct map_key {
 struct __attribute__((packed)) map {
     struct map_data_entry *data;
     struct map_key        *keys;
+    // Contiguous 32 byte key strings
+    char                  *short_key_store;
     long long              count;
     // Map inserting and erasing will
     // increase or decrease the capacity

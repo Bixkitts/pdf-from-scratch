@@ -19,7 +19,7 @@ static long long map_get_empty_slot(const struct map *map)
 // TODO: optimise af.
 // Make the strings contiguous and not alloc!!!!!
 static long long map_find_key(const struct map *map,
-                                    const struct map_key *restrict in_key)
+                              const struct map_key *restrict in_key)
 {
     for(long long i = 0; i < map->capacity; i++) {
         const struct map_key *key = &map->keys[i];
@@ -62,15 +62,18 @@ void new_map(struct map *out_map)
     // with one call
     assert(sizeof(*out_map->data) == sizeof(*out_map->keys));
 
-    void *mem = calloc(MAP_START_CAPACITY * 2, sizeof(*out_map->data));
+    size_t data_keys_size       = MAP_START_CAPACITY * 2 * sizeof(*out_map->data);
+    size_t short_key_store_size = MAP_START_CAPACITY * MAP_SMALL_STR_SIZE;
+    void *mem = aligned_alloc(32, data_keys_size + short_key_store_size);
     if (!mem) {
         exit(1);
     }
 
-    out_map->data     = mem;
-    out_map->keys     = &((struct map_key*)mem)[MAP_START_CAPACITY];
-    out_map->capacity = MAP_START_CAPACITY;
-    out_map->count    = 0;
+    out_map->data            = mem;
+    out_map->keys            =        &((struct map_key*)mem)[MAP_START_CAPACITY];
+    out_map->short_key_store = (char*)&((struct map_key*)mem)[MAP_START_CAPACITY*2];
+    out_map->capacity        = MAP_START_CAPACITY;
+    out_map->count           = 0;
 }
 
 void destroy_map(struct map *out_map)

@@ -35,7 +35,7 @@ char *str_replace(char *orig, char *rep, char *with) {
 	if (!orig || !rep) return NULL;
 	len_rep = strlen(rep);
 	if (len_rep == 0) return NULL;
-	if (!with) with = _strdup("");
+	if (!with) with = strdup("");
 	len_with = strlen(with);
 	len_orig = strlen(orig);
 
@@ -85,7 +85,7 @@ int replace_label_in_obj(char *obj_strarr[], int len, const char *label, const c
 	int cnt = 0;
 	
 	for (int i = 0; i < len; i++) {
-		if (out = str_replace(obj_strarr[i], c_label, _strdup(replace))) {
+		if ((out = str_replace(obj_strarr[i], c_label, strdup(replace)))) {
 			obj_strarr[i] = out;
 			cnt++;
 		}
