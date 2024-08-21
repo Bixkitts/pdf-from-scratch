@@ -56,17 +56,18 @@ static long long map_find_key(const struct map *map,
                               const struct map_key *restrict in_key)
 {
     if(in_key->len <= 32) {
-        // Fast search
+        // Fast search over contiguous
+        // map_key_store.
+        // Currently AVX2 SIMD linear search,
+        // swap it out with whatever.
         alignas(32) char tmp[32] = {};
         memcpy(tmp, in_key->string, in_key->len);
-        int res = find_32byte_chunk(map->short_key_store,
-                                    map->capacity,
-                                    tmp);
-        if(res >= 0) {
-            return res;
-        }
+        return find_32byte_chunk(map->short_key_store,
+                                 map->capacity,
+                                 tmp);
     }
-    // Slow search (falls back to this)
+    // Slow search for long keys
+    // (falls back to this)
     // Should still be very fast
     // because we skip unequal string lengths.
     for(long long i = 0; i < map->capacity; i++) {
@@ -178,7 +179,9 @@ void destroy_map(struct map *out_map)
 /* Stores a key in the map at the given *
  * slot if it is empty, otherwise does  *
  * nothing. We should never write over  *
- * an occupied key in the map           */
+ * an occupied key in the map,          *
+ * it needs to be explicitly erased     *
+ * first                                */
 static void map_try_store_key(struct map *out_map,
                               long long slot,                   
                               const struct map_key *in_key)
@@ -253,5 +256,9 @@ void map_erase(struct map *out_map,
 struct map_data_entry *map_get(const struct map *map,
                                const struct map_key *key)
 {
-    return &map->data[map_find_key(map, key)];
+    long long index = map_find_key(map, key);
+    if(index >= 0) {
+        return &map->data[index];
+    }
+    return NULL;
 }
