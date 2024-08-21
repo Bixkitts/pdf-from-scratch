@@ -3,7 +3,11 @@
 #include <assert.h>
 #include "defines.h"
 #include <string.h>
+
+#ifdef __AVX2__
 #include <immintrin.h>
+#endif
+
 #include <stdint.h>
 #include <stddef.h>
 
@@ -30,6 +34,7 @@ static long long map_get_empty_slot(const struct map *map)
  *                                         *
  * TODO: This could be a helper function   *
  *       independant of the map            */
+#ifdef __AVX2__
 static int find_32byte_chunk(const char* array,
                              size_t array_len,
                              const char* chunk) {
@@ -51,10 +56,13 @@ static int find_32byte_chunk(const char* array,
 
     return -1;  // No match found
 }
+#endif
 
 static long long map_find_key(const struct map *map,
                               const struct map_key *restrict in_key)
 {
+// TODO: #ifdef in a function is not pretty
+#ifdef __AVX2__
     if(in_key->len <= 32) {
         // Fast search over contiguous
         // map_key_store.
@@ -66,6 +74,7 @@ static long long map_find_key(const struct map *map,
                                  map->capacity,
                                  tmp);
     }
+#endif
     // Slow search for long keys
     // (falls back to this)
     // Should still be very fast
@@ -253,12 +262,12 @@ void map_erase(struct map *out_map,
 {
 }
 
-struct map_data_entry *map_get(const struct map *map,
-                               const struct map_key *key)
+struct map_data_entry *map_get(const struct map *out_map,
+                               const struct map_key *in_key)
 {
-    long long index = map_find_key(map, key);
+    long long index = map_find_key(out_map, in_key);
     if(index >= 0) {
-        return &map->data[index];
+        return &out_map->data[index];
     }
     return NULL;
 }
