@@ -142,3 +142,39 @@ int split_string_by_whitespace(char *str, char **out, size_t str_len, int count)
 	}
 	return i;
 }
+
+char* str_replace(char* orig, char* rep, char* with) {
+
+	if (!orig || !rep) return NULL;
+	size_t len_rep = strlen(rep);
+	if (len_rep == 0) return NULL;
+	if (!with) with = _strdup("");
+	size_t len_with = strlen(with);
+	size_t len_orig = strlen(orig);
+
+	char* ins = orig;
+	char* tmp;
+	int count = 0;
+	for (; (tmp = strstr(ins, rep)); ++count) {
+		ins = tmp + len_rep;
+	}
+
+	char* result;
+	tmp = result = malloc(strlen(orig) + (len_with - len_rep) * count + 1);
+
+	if (!result) return NULL;
+
+	size_t len_front = 0;
+	while (count--) {
+		ins = strstr(orig, rep);
+		len_front = ins - orig;
+		strncpy_s(tmp, len_orig + 1, orig, len_front);
+		tmp += len_front;
+		strcpy_s(tmp, len_with + 1, with);
+		tmp += len_with;
+		orig += len_front + len_rep;
+	}
+	strcpy_s(tmp, len_orig + 1, orig);
+	return result;
+}
+

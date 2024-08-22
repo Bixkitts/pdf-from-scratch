@@ -22,53 +22,13 @@ size_t get_obj_length(const char *obj_strarr[], size_t len, size_t lengths[]) {
 	return totalLength;
 }
 
-char *str_replace(char *orig, char *rep, char *with) {
-	char *result; 
-	char *ins;
-	char *tmp;
-	size_t len_rep;
-	size_t len_with;
-	size_t len_front = 0;
-	size_t len_orig;
-	int count;
-
-	if (!orig || !rep) return NULL;
-	len_rep = strlen(rep);
-	if (len_rep == 0) return NULL;
-	if (!with) with = _strdup("");
-	len_with = strlen(with);
-	len_orig = strlen(orig);
-
-	ins = orig;
-	for (count = 0; (tmp = strstr(ins, rep)); ++count) {
-		ins = tmp + len_rep;
-	}
-
-	tmp = result = malloc(strlen(orig) + (len_with - len_rep) * count + 1);
-
-	if (!result) return NULL;
-	
-	while (count--) {
-		ins = strstr(orig, rep);
-		len_front = ins - orig;
-		strncpy_s(tmp, len_orig + 1, orig, len_front);
-		tmp += len_front;
-		strcpy_s(tmp, len_with + 1, with);
-		tmp += len_with;
-		orig += len_front + len_rep;
-	}
-	strcpy_s(tmp, len_orig + 1, orig);
-	return result;
-}
-
-
-char* get_with_delim(const char* str) {
-	const char* replace_left_delim = "{{{";
+char *get_with_delim(const char *str) {
+	const char *replace_left_delim = "{{{";
 	const size_t ldlen = sizeof("{{{") - 1;
-	const char* replace_right_delim = "}}}";
+	const char *replace_right_delim = "}}}";
 	const size_t rdlen = sizeof("}}}") - 1;
 	size_t llen = strlen(str);
-	char* c_label = malloc(ldlen + rdlen + llen + 1);
+	char *c_label = malloc(ldlen + rdlen + llen + 1);
 	if(c_label == 0) return NULL;
 	c_label[ldlen + rdlen + llen] = '\0';
 	strcpy_s(c_label, ldlen + 1, replace_left_delim);
@@ -94,14 +54,14 @@ int replace_label_in_obj(char *obj_strarr[], int len, const char *label, const c
 }
 
 size_t get_stream_length(const char* obj_strarr[], int len) {
-	static const char* ENDSTREAM = "\nendstream\n";
-	static const char* STREAM = "stream\n";
+	static const char *ENDSTREAM = "\nendstream\n";
+	static const char *STREAM = "stream\n";
 	size_t total_length = 0;
 	int index_has_stream = -1;
 	int index_has_endstream = -1;
 	char* tmp = NULL;
 	for (int i = 0; i < len; i++) {
-		const char* bit = obj_strarr[i];
+		const char *bit = obj_strarr[i];
 		if ((tmp = strstr(bit, STREAM)) && index_has_stream == -1) {
 			index_has_stream = i;
 		}
@@ -113,7 +73,7 @@ size_t get_stream_length(const char* obj_strarr[], int len) {
 	if (index_has_stream > index_has_endstream) return 0;
 	if (index_has_stream == index_has_endstream) return 0; //TODO implement
 
-	const char* bit = obj_strarr[index_has_stream];
+	const char *bit = obj_strarr[index_has_stream];
 	total_length += count_chars_after_string(bit, STREAM, strlen(bit), sizeof(STREAM) - 1);
 
 	for (int i = index_has_stream + 1; i < index_has_endstream; i++) {
