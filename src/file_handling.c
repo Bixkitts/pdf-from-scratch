@@ -13,6 +13,7 @@
 #endif
 
 #include "file_handling.h"
+#include "mem_utils.h"
 
 #ifdef _WIN32
 void *memory_map_file(const char *filename, size_t *file_size)
@@ -49,32 +50,30 @@ void unmap_file(void *file_content, size_t file_size)
 {
     UnmapViewOfFile(file_content);
 }
-
 #else
+
+int fail_with(const char *message, int fd) {
+    perror(message);
+    if(fd != -1) close(fd);
+    return NULL;
+}
+
 void *memory_map_file(const char *filename, size_t *file_size)
 {
     int fd = open(filename, O_RDONLY);
-    if (fd == -1) {
-        perror("Error opening file");
-        return NULL;
-    }
-
     struct stat sb;
+    void *file_content;
+    if (fd == -1) {
+        return fail_with("Error opening file", fd);
+    }
     if (fstat(fd, &sb) == -1) {
-        perror("Error getting file size");
-        close(fd);
-        return NULL;
+        return fail_with("Error getting file size", fd);
     }
-
     *file_size = sb.st_size;
-
-    void *file_content = mmap(NULL, *file_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    *file_content = mmap(NULL, *file_size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (file_content == MAP_FAILED) {
-        perror("Error mapping file");
-        close(fd);
-        return NULL;
+        return fail_with("Error mapping file", fd);
     }
-
     close(fd);
     return file_content;
 }
@@ -104,15 +103,7 @@ struct line_info* parse_file(char *file_content, size_t file_size, size_t *num_l
             if (line_start[0] == '#') {
                 if (*num_lines >= capacity) {
                     capacity *= 2;
-                    struct line_info *temp = realloc(lines, capacity * sizeof(*lines));
-                    if(temp == NULL) {
-                        free(lines);
-                        perror("Failed to reallocate memory");
-                        exit(EXIT_FAILURE);
-                    }
-                    else {
-                        lines = temp;
-                    }
+                    lines = cooler_realloc(lines, capacity * sizeof(*lines));
                 }
                 
                 lines[*num_lines].line_index = line_index;
