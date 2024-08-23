@@ -1,6 +1,4 @@
 #include "mem_utils.h"
-#include <stddef.h>
-#include <stdlib.h>
 
 #define EXIT_FAILURE 1
 

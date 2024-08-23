@@ -1,6 +1,5 @@
 #pragma once
-
-#define EXIT_FAILURE 1
+#include <stddef.h>
 
 void *cooler_realloc(void *source, size_t new_capacity);
 
