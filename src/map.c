@@ -288,13 +288,9 @@ int map_mov_insert(struct map *out_map,
     return 0;
 }
 
-void map_erase(struct map *out_map,
-               const struct map_key *in_key)
+void map_erase_index(struct map *out_map,
+                     long long index)
 {
-    long long index = map_find_key(out_map, in_key);
-    if(index < 0) {
-        return;
-    }
     free(out_map->data[index].data);
     memset(&out_map->data[index], 0, sizeof(*out_map->data));
     if(!is_string_in_key_store(out_map, out_map->keys[index].string)) {
@@ -316,12 +312,24 @@ void map_erase(struct map *out_map,
     }
 }
 
-struct map_data_entry *map_get(const struct map *out_map,
-                               const struct map_key *in_key)
+void map_erase(struct map *out_map,
+               const struct map_key *in_key)
+{
+    long long index = map_find_key(out_map, in_key);
+    if(index < 0) {
+        return;
+    }
+    map_erase_index(out_map, index);
+}
+
+long long map_get(const struct map *out_map,
+                  const struct map_key *in_key,
+                  struct map_data_entry *out_data)
 {
     long long index = map_find_key(out_map, in_key);
     if(index >= 0) {
-        return &out_map->data[index];
+        out_data = &out_map->data[index];
+        return index;
     }
-    return NULL;
+    return -1;
 }

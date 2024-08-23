@@ -74,9 +74,18 @@ int   map_mov_insert  (struct map *out_map,
  * before erasing them.                     */
 void  map_erase       (struct map *out_map,
                        const struct map_key *in_key);
+/* Index is NOT checked,                *
+ * will crash the program if invalid.   *
+ * Use index returned from map_get.     */
+void  map_erase_index (struct map *out_map,
+                       long long index);
 
-/* Returns NULL if an object corresponding  *
- * to a key was not found, otherwise        *
- * returns the object.                      */
-struct map_data_entry *map_get (const struct map *out_map,
-                                const struct map_key *in_key);
+/* Returns the index to the object in the   *
+ * map, and sets out_data to point to it.   *
+ * If the key is not found, the function    *
+ * returns -1 and doesn't modify out_data.  *
+ * Pass the returned index to               *
+ * map_erase_index().                       */
+long long map_get (const struct map *in_map,
+                   const struct map_key *in_key,
+                   struct map_data_entry *out_data);
