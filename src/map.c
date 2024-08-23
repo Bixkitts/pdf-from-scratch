@@ -58,6 +58,8 @@ static int find_32byte_chunk(const char* array,
 }
 #endif
 
+/* Returns the index in the map,     *
+ * or -1 on failure to find the key. */
 static long long map_find_key(const struct map *map,
                               const struct map_key *restrict in_key)
 {
@@ -134,6 +136,40 @@ static void map_grow(struct map *out_map)
     out_map->capacity *= MAP_GROWTH_FACTOR;
 }
 
+static void map_shrink(struct map *out_map)
+{
+    if(out_map->capacity <= MAP_START_CAPACITY) {
+        return;
+    }
+    assert(sizeof(*out_map->data) == sizeof(*out_map->keys));
+    const size_t data_size            = out_map->capacity
+                                        * sizeof(*out_map->data);
+    const size_t data_keys_size       = data_size * 2;    
+    const size_t short_key_store_size = out_map->capacity * MAP_SMALL_STR_SIZE;
+    const size_t current_size         = data_keys_size + short_key_store_size;
+    const size_t total_alloc          = current_size / MAP_SHRINK_FACTOR;
+    // Aligned for AVX2
+    void *new_mem = aligned_alloc(32, total_alloc);
+    if (!new_mem) {
+        exit(1);
+    }
+    // We need to zero it because of
+    // 256 bit string comparisons
+    memset (new_mem, 0, total_alloc);
+    memcpy (new_mem,
+            out_map->data,
+            data_size);
+    memcpy ((char*)new_mem + data_size,
+            out_map->keys,
+            data_size);
+    memcpy ((char*)new_mem + data_keys_size,
+            out_map->short_key_store,
+            data_size);
+    free   (out_map->data);
+    out_map->data = new_mem;
+    out_map->capacity /= MAP_SHRINK_FACTOR;
+}
+
 /* THIS IS NOT A SEARCH FUNCTION.      *
  * We know if any string is in our     *
  * map short_key_store if it's memory  *
@@ -191,7 +227,6 @@ void destroy_map(struct map *out_map)
     // consult new_map()
     free   (out_map->data);
     memset (out_map, 0, sizeof(*out_map));
-    // Remember to free
 }
 
 /* Stores a key in the map at the given *
@@ -207,16 +242,22 @@ static void map_try_store_key(struct map *out_map,
     if (out_map->keys[slot].string) {
         return;
     }
-    if(in_key->len <= MAP_SMALL_STR_SIZE) {
-        memcpy(out_map->keys[slot].string, in_key->string, in_key->len);
-    }
     out_map->keys[slot].len    = in_key->len;
-    out_map->keys[slot].string = malloc(in_key->len);
+    if(in_key->len <= MAP_SMALL_STR_SIZE) {
+        out_map->keys[slot].string = &out_map->short_key_store[slot*MAP_SMALL_STR_SIZE];
+        memcpy(out_map->keys[slot].string,
+               in_key->string,
+               in_key->len);
+        return;
+    }
+
+    out_map->keys[slot].string = calloc(in_key->len, sizeof(char));
     if(!out_map->keys[slot].string) {
         exit(1);
     }
-    memcpy(out_map->keys[slot].string, in_key->string, in_key->len);
-
+    memcpy(out_map->keys[slot].string,
+           in_key->string,
+           in_key->len);
 }
 
 void map_cpy_insert(struct map *out_map,
@@ -269,6 +310,27 @@ void map_mov_insert(struct map *out_map,
 void map_erase(struct map *out_map,
                const struct map_key *in_key)
 {
+    long long index = map_find_key(out_map, in_key);
+    if(index < 0) {
+        return;
+    }
+    free(out_map->data[index].data);
+    memset(&out_map->data[index], 0, sizeof(*out_map->data));
+    if(!is_string_in_key_store(out_map, out_map->keys[index].string)) {
+        free(out_map->keys[index].string);
+    }
+    else {
+        memset(&out_map->short_key_store[index*MAP_SMALL_STR_SIZE],
+               0,
+               MAP_SMALL_STR_SIZE);
+    }
+    memset(&out_map->keys[index],
+           0,
+           sizeof(*out_map->keys));
+    out_map->count--;
+    if(out_map->count < (out_map->capacity / (MAP_SHRINK_FACTOR * 2))) {
+        map_shrink(out_map);
+    }
 }
 
 struct map_data_entry *map_get(const struct map *out_map,

@@ -2,9 +2,13 @@
 
 #include <stdio.h>
 
+// Change these as you want
 #define MAP_START_CAPACITY 16
 #define MAP_GROWTH_FACTOR  2
 #define MAP_SHRINK_FACTOR  2
+
+// MUST be 32, always, because of
+// AVX 256
 #define MAP_SMALL_STR_SIZE 32
 
 struct map_data_entry {
