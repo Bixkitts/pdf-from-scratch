@@ -3,7 +3,9 @@
 #include <stdio.h>
 
 // Change these as you want
-#define MAP_START_CAPACITY 16
+#define MAP_START_CAPACITY 16    // Should be pow 2
+#define MAP_MAX_CAPACITY   65536 // Should be pow 2,
+                                 // never exceed int64 max
 #define MAP_GROWTH_FACTOR  2
 #define MAP_SHRINK_FACTOR  2
 
@@ -53,15 +55,17 @@ void new_map     (struct map *out_map);
 void destroy_map (struct map *out_map);
 
 /* This function copies data it             *
- * inserts.                                 */
-void  map_cpy_insert  (struct map *out_map,
+ * inserts.                                 *
+ * Returns -1 on failure (map full)         */
+int   map_cpy_insert  (struct map *out_map,
                        const struct map_key *in_key,
                        const char *restrict data,
                        size_t data_size);
 
 /* This function takes ownership of         *
- * the data it's passed.                    */
-void  map_mov_insert  (struct map *out_map,
+ * the data it's passed.                    *
+ * Returns -1 on failure (map full)         */
+int   map_mov_insert  (struct map *out_map,
                        const struct map_key *in_key,
                        char *data,
                        size_t data_size);

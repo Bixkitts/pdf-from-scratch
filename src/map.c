@@ -105,49 +105,22 @@ static long long map_get_slot_from_key(const struct map *in_map,
     return slot;
 }
 
-static void map_grow(struct map *out_map)
-{
-    assert(sizeof(*out_map->data) == sizeof(*out_map->keys));
-    const size_t data_size            = out_map->capacity
-                                        * sizeof(*out_map->data);
-    const size_t data_keys_size       = data_size * 2;    
-    const size_t short_key_store_size = out_map->capacity * MAP_SMALL_STR_SIZE;
-    const size_t current_size         = data_keys_size + short_key_store_size;
-    const size_t total_alloc          = MAP_GROWTH_FACTOR * current_size;
-    // Aligned for AVX2
-    void *new_mem = aligned_alloc(32, total_alloc);
-    if (!new_mem) {
-        exit(1);
-    }
-    // We need to zero it because of
-    // 256 bit string comparisons
-    memset (new_mem, 0, total_alloc);
-    memcpy (new_mem,
-            out_map->data,
-            data_size);
-    memcpy ((char*)new_mem + data_size,
-            out_map->keys,
-            data_size);
-    memcpy ((char*)new_mem + data_keys_size,
-            out_map->short_key_store,
-            data_size);
-    free   (out_map->data);
-    out_map->data = new_mem;
-    out_map->capacity *= MAP_GROWTH_FACTOR;
-}
-
-static void map_shrink(struct map *out_map)
+static int map_resize(struct map *out_map, size_t capacity)
 {
     if(out_map->capacity <= MAP_START_CAPACITY) {
-        return;
+        return 0;
     }
+    if(capacity > MAP_MAX_CAPACITY) {
+        return -1;
+    }
+    out_map->capacity = capacity;
     assert(sizeof(*out_map->data) == sizeof(*out_map->keys));
     const size_t data_size            = out_map->capacity
                                         * sizeof(*out_map->data);
     const size_t data_keys_size       = data_size * 2;    
     const size_t short_key_store_size = out_map->capacity * MAP_SMALL_STR_SIZE;
     const size_t current_size         = data_keys_size + short_key_store_size;
-    const size_t total_alloc          = current_size / MAP_SHRINK_FACTOR;
+    const size_t total_alloc          = current_size;
     // Aligned for AVX2
     void *new_mem = aligned_alloc(32, total_alloc);
     if (!new_mem) {
@@ -167,7 +140,7 @@ static void map_shrink(struct map *out_map)
             data_size);
     free   (out_map->data);
     out_map->data = new_mem;
-    out_map->capacity /= MAP_SHRINK_FACTOR;
+    return 0;
 }
 
 /* THIS IS NOT A SEARCH FUNCTION.      *
@@ -260,15 +233,18 @@ static void map_try_store_key(struct map *out_map,
            in_key->len);
 }
 
-void map_cpy_insert(struct map *out_map,
-                    const struct map_key *in_key,
-                    const char *restrict data,
-                    size_t data_size)
+int map_cpy_insert(struct map *out_map,
+                   const struct map_key *in_key,
+                   const char *restrict data,
+                   size_t data_size)
 {
     long long slot = map_get_slot_from_key(out_map,
                                            in_key);
     if(slot < 0) {
-        map_grow       (out_map);
+        if(!!map_resize(out_map,
+                        out_map->capacity * MAP_GROWTH_FACTOR)) {
+            return -1;
+        }
         // Will always succeed on first recursion
         map_cpy_insert (out_map,
                         in_key,
@@ -284,17 +260,21 @@ void map_cpy_insert(struct map *out_map,
         exit(1);
     }
     memcpy(dest, data, data_size);
+    return 0;
 }
 
-void map_mov_insert(struct map *out_map,
-                    const struct map_key *in_key,
-                    char *data,
-                    size_t data_size)
+int map_mov_insert(struct map *out_map,
+                   const struct map_key *in_key,
+                   char *data,
+                   size_t data_size)
 {
     long long slot = map_get_slot_from_key(out_map,
                                            in_key);
     if(slot < 0) {
-        map_grow       (out_map);
+        if(!!map_resize(out_map,
+                        out_map->capacity * MAP_GROWTH_FACTOR)) {
+            return -1;
+        }
         // Will always succeed on first recursion
         map_mov_insert (out_map,
                         in_key,
@@ -305,6 +285,7 @@ void map_mov_insert(struct map *out_map,
     out_map->count++;
     out_map->data[slot].len  = data_size;
     out_map->data[slot].data = data;
+    return 0;
 }
 
 void map_erase(struct map *out_map,
@@ -328,8 +309,10 @@ void map_erase(struct map *out_map,
            0,
            sizeof(*out_map->keys));
     out_map->count--;
-    if(out_map->count < (out_map->capacity / (MAP_SHRINK_FACTOR * 2))) {
-        map_shrink(out_map);
+    size_t shrink = out_map->capacity / MAP_SHRINK_FACTOR;
+    if(out_map->count < ((long long)shrink / 2)) {
+        // Shrinking should always succeed
+        map_resize(out_map, shrink);
     }
 }
 
