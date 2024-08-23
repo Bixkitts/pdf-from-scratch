@@ -7,6 +7,7 @@
 #include "pdf_tests.h"
 #include "str_util_tests.h"
 #include "dict_util_tests.h"
+#include "map_tests.h"
 
 static void mmap_and_parse_file(const char* filename);
 
@@ -14,6 +15,7 @@ static void do_tests(void) {
     do_pdf_utils_tests();
     do_str_utils_tests();
     do_dict_util_tests();
+    do_map_tests();
     char ch;
     printf("passed %d of %d.\n", p, t);
     printf("Press ENTER key to Continue\n");
