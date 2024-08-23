@@ -52,7 +52,7 @@ void unmap_file(void *file_content, size_t file_size)
 }
 #else
 
-int fail_with(const char *message, int fd) {
+void *fail_with(const char *message, int fd) {
     perror(message);
     if(fd != -1) close(fd);
     return NULL;
