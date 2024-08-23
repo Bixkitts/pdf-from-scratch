@@ -1,10 +1,12 @@
 #pragma once
 
-//#include "defines.h"
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
 #include <ctype.h>
+
+#include "defines.h"
+#include "mem_utils.h"
 
 // TODO: optimise test and verify
 void str_rev(char *str)
@@ -90,7 +92,7 @@ int strarr_cmp(char **arra, char **arrb, size_t len) {
 
 // TODO: Linux version
 #ifdef _WIN32
-char* strsep(char **stringp, const char *delim) {
+char *strsep(char **stringp, const char *delim) {
 	char *start = *stringp;
 	char *ptr;
 	
@@ -132,8 +134,7 @@ int split_string_by_whitespace(char *str, char **out, size_t str_len, int count)
 	while (sp != end && i < count) {
 		char *sp2 = sp;
 		while (sp2 != end && !isspace((unsigned char)*sp2)) sp2++;
-		out[i] = malloc(sp2 - sp + 1);
-		if(out[i] == NULL) assert(0);
+		out[i] = cooler_malloc(sp2 - sp + 1);
 		memcpy(out[i], sp, sp2 - sp);
 		out[i][sp2 - sp] = '\0';
 		i++;
@@ -143,12 +144,11 @@ int split_string_by_whitespace(char *str, char **out, size_t str_len, int count)
 	return i;
 }
 
-char* str_replace(char* orig, char* rep, char* with) {
-
+char *str_replace(char *orig, char *rep, const char *with) {
 	if (!orig || !rep) return NULL;
 	size_t len_rep = strlen(rep);
 	if (len_rep == 0) return NULL;
-	if (!with) with = _strdup("");
+	if (!with) with = "";
 	size_t len_with = strlen(with);
 	size_t len_orig = strlen(orig);
 
@@ -160,9 +160,7 @@ char* str_replace(char* orig, char* rep, char* with) {
 	}
 
 	char* result;
-	tmp = result = malloc(strlen(orig) + (len_with - len_rep) * count + 1);
-
-	if (!result) return NULL;
+	tmp = result = cooler_malloc(strlen(orig) + (len_with - len_rep) * count + 1);
 
 	size_t len_front = 0;
 	while (count--) {

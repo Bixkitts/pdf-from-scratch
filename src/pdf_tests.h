@@ -2,6 +2,7 @@
 
 #include "pdf_utils.h"
 #include "test_util.h"
+#include "mem_utils.h"
 
 int obj_length_test(void) {
 	const char *ex_obj[] = {
@@ -70,8 +71,7 @@ int obj_lens_calculated_properly(void) {
 		"c"
 	};
 	size_t ex_arr_len = STARRLEN(ex_arr);
-	size_t* lens = malloc(sizeof(size_t) * ex_arr_len);
-	if(lens == NULL) return 0;
+	size_t* lens = cooler_malloc(sizeof(size_t) * ex_arr_len);
 	get_obj_length(ex_arr, STARRLEN(ex_arr), lens);
 		
 	return lens[0] == 1 && lens[1] == 1 && lens[2] == 1;
@@ -88,8 +88,7 @@ int obj_lens_real_example_calculated_properly(void) {
 		"\nendstream\n"
 	};
 	size_t ex_obj_len = STARRLEN(ex_obj);
-	size_t* lens = malloc(sizeof(size_t) * ex_obj_len);
-	if(lens == NULL) return 0;
+	size_t* lens = cooler_malloc(sizeof(size_t) * ex_obj_len);
 	get_obj_length(ex_obj, STARRLEN(ex_obj), lens);
 
 	return lens[3] == 11;

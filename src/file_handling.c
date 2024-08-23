@@ -88,11 +88,7 @@ void unmap_file(void *file_content, size_t file_size)
 struct line_info* parse_file(char *file_content, size_t file_size, size_t *num_lines)
 {
     size_t capacity = 10; 
-    struct line_info *lines = malloc(capacity * sizeof(*lines));
-    if (!lines) {
-        perror("Failed to allocate memory");
-        exit(EXIT_FAILURE);
-    }
+    struct line_info *lines = cooler_malloc(capacity * sizeof(*lines));
 
     size_t line_index = 0;
     char *line_start = file_content;

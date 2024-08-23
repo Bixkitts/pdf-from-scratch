@@ -8,6 +8,7 @@
 
 #include "defines.h"
 #include "str_utils.h"
+#include "mem_utils.h"
 
 #define get_obj_length1(obj_strarr) get_obj_length(obj_strarr, STARRLEN(obj_strarr), NULL)
 #define get_obj_length2(obj_strarr, len) get_obj_length(obj_strarr, len, NULL)
@@ -28,8 +29,7 @@ char *get_with_delim(const char *str) {
 	const char *replace_right_delim = "}}}";
 	const size_t rdlen = sizeof("}}}") - 1;
 	size_t llen = strlen(str);
-	char *c_label = malloc(ldlen + rdlen + llen + 1);
-	if(c_label == 0) return NULL;
+	char *c_label = cooler_malloc(ldlen + rdlen + llen + 1);
 	c_label[ldlen + rdlen + llen] = '\0';
 	strcpy_s(c_label, ldlen + 1, replace_left_delim);
 	strcpy_s(c_label + ldlen, llen + 1, str);
@@ -85,11 +85,9 @@ size_t get_stream_length(const char* obj_strarr[], int len) {
 }
 
 size_t obj_join(char **out, const char *obj_strarr[], size_t len) {
-	size_t *lens = malloc(sizeof(size_t) * len);
-	if(lens == 0) return 0;
+	size_t *lens = cooler_malloc(sizeof(size_t) * len);
 	size_t obj_len = get_obj_length(obj_strarr, len, lens);
-	*out = malloc(obj_len + 1); 
-	if(*out == NULL) return 0;
+	*out = cooler_malloc(obj_len + 1); 
 	(*out)[obj_len] = '\0';
 	for (size_t i = 0, rsum = 0; i < len; i++) {
 		strcpy_s(*out + rsum, lens[i] + 1, obj_strarr[i]);
