@@ -242,7 +242,7 @@ static void map_try_store_key(struct map *out_map,
     if (out_map->keys[slot].string) {
         return;
     }
-    out_map->keys[slot].len    = in_key->len;
+    out_map->keys[slot].len = in_key->len;
     if(in_key->len <= MAP_SMALL_STR_SIZE) {
         out_map->keys[slot].string = &out_map->short_key_store[slot*MAP_SMALL_STR_SIZE];
         memcpy(out_map->keys[slot].string,
