@@ -9,4 +9,5 @@
 
 #ifdef _WIN32
 #define strdup(a) _strdup(a)
+#define restrict __restrict
 #endif

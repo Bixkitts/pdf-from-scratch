@@ -29,8 +29,7 @@ char *get_with_delim(const char *str) {
 	const char *replace_right_delim = "}}}";
 	const size_t rdlen = sizeof("}}}") - 1;
 	size_t llen = strlen(str);
-	char *c_label = cooler_malloc(ldlen + rdlen + llen + 1);
-	c_label[ldlen + rdlen + llen] = '\0';
+	char *c_label = stralloc(ldlen + rdlen + llen + 1);
 	strcpy_s(c_label, ldlen + 1, replace_left_delim);
 	strcpy_s(c_label + ldlen, llen + 1, str);
 	strcpy_s(c_label + ldlen + llen, rdlen + 1, replace_right_delim);
@@ -87,8 +86,7 @@ size_t get_stream_length(const char* obj_strarr[], int len) {
 size_t obj_join(char **out, const char *obj_strarr[], size_t len) {
 	size_t *lens = cooler_malloc(sizeof(size_t) * len);
 	size_t obj_len = get_obj_length(obj_strarr, len, lens);
-	*out = cooler_malloc(obj_len + 1); 
-	(*out)[obj_len] = '\0';
+	*out = stralloc(obj_len + 1); 
 	for (size_t i = 0, rsum = 0; i < len; i++) {
 		strcpy_s(*out + rsum, lens[i] + 1, obj_strarr[i]);
 		rsum += lens[i];

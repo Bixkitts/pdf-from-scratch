@@ -33,7 +33,11 @@ struct map_key {
 //     void *memory;
 // };
 //
+#ifdef _WIN32
+struct map {
+#else
 struct __attribute__((packed)) map {
+#endif
     struct map_data_entry *data;
     struct map_key        *keys;
     // A block of memory for short

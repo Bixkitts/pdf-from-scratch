@@ -15,7 +15,9 @@ static void do_tests(void) {
     do_pdf_utils_tests();
     do_str_utils_tests();
     do_dict_util_tests();
+#ifndef _WIN32
     do_map_tests();
+#endif
     char ch;
     printf("passed %d of %d.\n", p, t);
     printf("Press ENTER key to Continue\n");

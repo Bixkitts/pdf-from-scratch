@@ -134,9 +134,8 @@ int split_string_by_whitespace(char *str, char **out, size_t str_len, int count)
 	while (sp != end && i < count) {
 		char *sp2 = sp;
 		while (sp2 != end && !isspace((unsigned char)*sp2)) sp2++;
-		out[i] = cooler_malloc(sp2 - sp + 1);
+		out[i] = stralloc(sp2 - sp + 1);
 		memcpy(out[i], sp, sp2 - sp);
-		out[i][sp2 - sp] = '\0';
 		i++;
 		sp = sp2;
 		while (sp != end && isspace((unsigned char)*sp)) sp++;

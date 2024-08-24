@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <assert.h>
-#include "defines.h"
 #include <string.h>
 
 #ifdef __AVX2__
@@ -10,7 +9,12 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#ifdef _WIN32
+#include <stdbool.h>
+#endif
 
+#include "defines.h"
+#include "mem_utils.h"
 #include "map.h"
 
 static long long map_get_empty_slot(const struct map *map)

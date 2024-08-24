@@ -77,8 +77,7 @@ int find_nested_in_dict_str(const char *str_dict, size_t str_len) {
 	if(o_ptr == NULL) return 0;
 	s_ptr += 2;
 	size_t out_len = o_ptr - s_ptr;
-	char* out = cooler_malloc(out_len + 1);
-	out[out_len] = '\0';
+	char* out = stralloc(out_len + 1);
 	memcpy(out, s_ptr, out_len);
 	printf("%s \n", out);
 	return 1;
