@@ -17,7 +17,7 @@ int test_str_dict_to_arr(void) {
 	char** out = NULL;
 	int items = str_dict_to_arr(strdup(ex_dict2), out);
 	for (int i = 0; i < items; i++) {
-		printf("%s \n", out[i]);
+		if (NULL != out) printf("%s \n", out[i]);
 	}
 	return 1;
 }
