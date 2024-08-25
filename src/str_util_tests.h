@@ -6,6 +6,13 @@
 #include "mem_utils.h"
 #include <stdio.h>
 
+int test_str_replace(void) {
+	const char* test_str = "aaaatesaaaatest, test, est aaa";
+	char * result = str_replace(test_str, "test", "dupa");
+	
+	return strcmp(result, "aaaatesaaaadupa, dupa, est aaa") == 0;
+}
+
 int test_count_for_split_str_by_whitespace(void) {
 	const char* test_str = "a    b c d   e\n f\t\n\v g";
 	int res = count_for_split_str_by_whitespace(strdup(test_str), strlen(test_str));
@@ -25,4 +32,5 @@ int test_split_string_by_whitespace(void) {
 void do_str_utils_tests(void) {
 	RUNTEST(test_count_for_split_str_by_whitespace);
 	RUNTEST(test_split_string_by_whitespace);
+	RUNTEST(test_str_replace);
 }

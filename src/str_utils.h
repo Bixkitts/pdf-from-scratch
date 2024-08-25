@@ -143,7 +143,7 @@ int split_string_by_whitespace(char *str, char **out, size_t str_len, int count)
 	return i;
 }
 
-char *str_replace(char *orig, char *rep, const char *with) {
+char *str_replace(const char *orig, const char *rep, const char *with) {
 	if (!orig || !rep) return NULL;
 	size_t len_rep = strlen(rep);
 	if (len_rep == 0) return NULL;
@@ -151,8 +151,8 @@ char *str_replace(char *orig, char *rep, const char *with) {
 	size_t len_with = strlen(with);
 	size_t len_orig = strlen(orig);
 
-	char* ins = orig;
-	char* tmp;
+	const char *ins = orig;
+	char *tmp;
 	int count = 0;
 	for (; (tmp = strstr(ins, rep)); ++count) {
 		ins = tmp + len_rep;
