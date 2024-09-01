@@ -77,10 +77,51 @@ size_t count_chars_after_string(const char *str, const char *after, size_t str_l
 	return pos - str + after_len - str_len;
 }
 
-static char idc[32];
-char *itoa_helper(int val) {
-	_itoa_s(val, idc, 32, 10);
+const char *find_nonspace(const char *begin, const char *end) {
+	if (NULL == end) end = begin + strlen(end);
+	const char *res = begin;
+	while (res < end && *res != '\0' && isspace((unsigned char)*res)) res++;
+	return res;
+}
+
+const char *find_space(const char *begin, const char *end) {
+	if (NULL == end) end = begin + strlen(end);
+	const char *res = begin;
+	while (res < end && *res != '\0' && !isspace((unsigned char)*res)) res++;
+	return res;
+}
+
+#define INTERNAL_BSIZE 32
+static char idc[INTERNAL_BSIZE];
+char *lltoa_helper(long long val) {
+	snprintf(idc, INTERNAL_BSIZE, "%lld", val);
 	return strdup(idc);
+}
+
+char *sizetoa_helper(size_t val) {
+	snprintf(idc, INTERNAL_BSIZE, "%zu", (unsigned long long)val);
+	return strdup(idc);
+}
+#undef INTERNAL_BSIZE
+
+long long strtoll_helper(char *str) {
+	char *endstr = (char *)find_space(str, str + strlen(str));
+	return strtoll(str, &endstr, 10);
+}
+
+size_t strtoull_helper(char *str) {
+	char *endstr = (char*)find_space(str, str + strlen(str));
+	return (size_t)strtoull(str, &endstr, 10);
+}
+
+long long strtoll_helper_2(char *str, char *endstr) {
+	endstr = ptr_coallesce(endstr, (void*)find_space(str, endstr));
+	return strtoll(str, &endstr, 10);
+}
+
+size_t strtoull_helper_2(char *str, char *endstr) {
+	endstr = ptr_coallesce(endstr, (void *)find_space(str, endstr));
+	return (size_t)strtoull(str, &endstr, 10);
 }
 
 int strarr_cmp(char **arra, char **arrb, size_t len) {
@@ -90,7 +131,14 @@ int strarr_cmp(char **arra, char **arrb, size_t len) {
 	return 0;
 }
 
-// TODO: Linux version
+int char_in_str(char ch, const char *ctrl) {
+	size_t n = strlen(ctrl);
+	for (size_t i = 0; i < n; i++) {
+		if(ch == ctrl[i]) return 1;
+	}
+	return 0;
+}
+
 #ifdef _WIN32
 char *strsep(char **stringp, const char *delim) {
 	char *start = *stringp;
@@ -111,6 +159,15 @@ char *strsep(char **stringp, const char *delim) {
 	*stringp = ptr + 1;
 	return start;
 }
+#elif
+char *strpbrk(const char *str, const char *ctrl) {
+	const char *res = str;
+	while (*(res) != '\0') {
+		if(char_in_str(*res, ctrl)) return (char*)res;
+		res++;
+	}
+	return NULL;
+}
 #endif
 
 int count_for_split_str_by_whitespace(char *str, size_t str_len) {
@@ -130,15 +187,15 @@ int split_string_by_whitespace(char *str, char **out, size_t str_len, int count)
 	char *end = str + str_len;
 	char *sp = str;
 	int i = 0;
-	while (sp != end && isspace((unsigned char)*sp)) sp++;
+	sp = (char*)find_nonspace(sp, end);
 	while (sp != end && i < count) {
 		char *sp2 = sp;
-		while (sp2 != end && !isspace((unsigned char)*sp2)) sp2++;
+		sp2 = (char*)find_space(sp2, end);
 		out[i] = stralloc(sp2 - sp + 1);
 		memcpy(out[i], sp, sp2 - sp);
 		i++;
 		sp = sp2;
-		while (sp != end && isspace((unsigned char)*sp)) sp++;
+		sp = (char*)find_nonspace(sp, end);
 	}
 	return i;
 }

@@ -57,7 +57,7 @@ int obj_stream_pastes_correctly(void) {
 		"\nendstream\n"
 	};
 	size_t slen = get_stream_length((const char**)ex_obj, STARRLEN(ex_obj));
-	char *lenstr = itoa_helper((int)slen);
+	char *lenstr = sizetoa_helper(slen);
 	replace_label_in_obj(ex_obj, STARRLEN(ex_obj), "leee n", lenstr);
 	return strcmp(ex_obj[0], "4 0 obj\n"
 		"<<"

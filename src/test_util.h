@@ -14,3 +14,5 @@ static int p = 0;
 static int t = 0;
 static int tres = 0;
 #define RUNTEST(x) {tres = x(); iassert(tres); p += tres; t++;}; 
+
+#undef SOFT_FAIL

@@ -15,7 +15,7 @@ void *cooler_realloc(void *source, size_t new_capacity) {
 		exit(EXIT_FAILURE);
 	}
 #endif
-	return res;
+	return ptr_coallesce(res, source);
 }
 
 void *cooler_malloc(size_t size) {
@@ -41,3 +41,7 @@ void *aligned_alloc(int allign, size_t size) {
 	return cooler_malloc(size);
 }
 #endif
+
+void *ptr_coallesce(void *a, void *b) {
+	return NULL == a ? b : a;
+}
