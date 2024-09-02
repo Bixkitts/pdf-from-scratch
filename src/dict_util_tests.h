@@ -42,7 +42,14 @@ int test_find_nested_in_dict_str(void) {
 	return 1;
 }
 
+int overflow_dict(void) {
+	const char* out_dict = "<<";
+	find_nested_in_dict_str(out_dict, strlen(out_dict));
+	return 1;
+}
+
 void do_dict_util_tests(void) {
 	RUNTEST(test_str_dict_to_arr);
 	RUNTEST(test_find_nested_in_dict_str);
+    RUNTEST(overflow_dict);
 }
