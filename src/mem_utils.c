@@ -37,12 +37,6 @@ void *stralloc(size_t size) {
 	return res;
 }
 
-#ifdef _WIN32
-void *aligned_alloc(int allign, size_t size) {
-	return cooler_malloc(size);
-}
-#endif
-
 void *ptr_coallesce(void *a, void *b) {
 	return NULL == a ? b : a;
 }

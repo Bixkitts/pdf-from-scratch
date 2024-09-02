@@ -202,8 +202,8 @@ void destroy_map(struct map *out_map)
     }
     // We only have one allocation;
     // consult new_map()
-    free   (out_map->data);
-    memset (out_map, 0, sizeof(*out_map));
+    aligned_free (out_map->data);
+    memset       (out_map, 0, sizeof(*out_map));
 }
 
 /* Stores a key in the map at the given *
