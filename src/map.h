@@ -92,4 +92,4 @@ void  map_erase_index (struct map *out_map,
  * map_erase_index().                       */
 long long map_get (const struct map *in_map,
                    const struct map_key *in_key,
-                   struct map_data_entry *out_data);
+                   struct map_data_entry **out_data);

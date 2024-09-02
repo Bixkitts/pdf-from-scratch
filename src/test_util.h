@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 #ifdef SOFT_FAIL
-	void iassert(int a) { if(a == 0) printf("assertion failure :(\n"); }
+	void iassert(int a) { if(!a) printf("assertion failure :(\n"); }
 #else
 #define iassert(a) assert(a)
 #endif

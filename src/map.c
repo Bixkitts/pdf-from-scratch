@@ -151,13 +151,13 @@ static int map_resize(struct map *out_map, size_t capacity)
  * We know if any string is in our     *
  * map short_key_store if it's memory  *
  * address falls within the block.     */
-static bool is_string_in_key_store(const struct map *map,
-                                   const char *string)
-{
-    return string < map->short_key_store
-           || string > map->short_key_store
-              + map->capacity * MAP_SMALL_STR_SIZE * sizeof(char);
-}
+//static bool is_string_in_key_store(const struct map *map,
+//                                   const char *string)
+//{
+//    return string < map->short_key_store
+//           || string > map->short_key_store
+//              + map->capacity * MAP_SMALL_STR_SIZE * sizeof(char);
+//}
 
 void new_map(struct map *out_map)
 {
@@ -196,7 +196,7 @@ void destroy_map(struct map *out_map)
         // Strings smaller than 33 bytes
         // are copied into a contiguous key store
         // larger ones are allocated
-        if(!is_string_in_key_store(out_map, out_map->keys[i].string)) {
+        if(out_map->keys[i].len > MAP_SMALL_STR_SIZE) {
             free(out_map->keys[i].string);
         }
     }
@@ -258,12 +258,13 @@ int map_cpy_insert(struct map *out_map,
     out_map->count++;
     out_map->data[slot].len = data_size;
     map_try_store_key(out_map, slot, in_key);
-    char *dest = out_map->data[slot].data;
-    dest = malloc(data_size);
-    if(!dest) {
+
+    char **dest = &out_map->data[slot].data;
+    *dest = malloc(data_size * sizeof(char));
+    if(!*dest) {
         exit(1);
     }
-    memcpy(dest, data, data_size);
+    memcpy(*dest, data, data_size);
     return 0;
 }
 
@@ -297,7 +298,7 @@ void map_erase_index(struct map *out_map,
 {
     free(out_map->data[index].data);
     memset(&out_map->data[index], 0, sizeof(*out_map->data));
-    if(!is_string_in_key_store(out_map, out_map->keys[index].string)) {
+    if(out_map->keys[index].len > MAP_SMALL_STR_SIZE) {
         free(out_map->keys[index].string);
     }
     else {
@@ -328,11 +329,11 @@ void map_erase(struct map *out_map,
 
 long long map_get(const struct map *out_map,
                   const struct map_key *in_key,
-                  struct map_data_entry *out_data)
+                  struct map_data_entry **out_data)
 {
     long long index = map_find_key(out_map, in_key);
     if(index >= 0) {
-        out_data = &out_map->data[index];
+        *out_data = &out_map->data[index];
         return index;
     }
     return -1;

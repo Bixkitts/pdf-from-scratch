@@ -21,7 +21,7 @@ static void do_tests(void) {
     char ch;
     printf("passed %d of %d.\n", p, t);
     printf("Press ENTER key to Continue\n");
-    int i = scanf("%c", &ch);
+    volatile int i = scanf("%c", &ch);
     i++;
 }
 
