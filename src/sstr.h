@@ -1,6 +1,7 @@
-
 #include <stddef.h>
 #include <string.h>
+
+#include "defines.h"
 
 #define SSTRE 24
 
@@ -31,7 +32,7 @@ union ustr {
 union ustr create(char *str, size_t len, size_t capacity) {
 	if(len == 0) len = strlen(str);
 	union ustr res;
-	if (res.unkw.is_long = len > SSTRE - 1) {
+	if ((res.unkw.is_long = len > (SSTRE - 1))) {
 		res.lstr.len = len;
 		res.lstr.content = str;
 		res.lstr.capacity = capacity;

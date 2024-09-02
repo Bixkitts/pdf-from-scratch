@@ -70,7 +70,7 @@ void *memory_map_file(const char *filename, size_t *file_size)
         return fail_with("Error getting file size", fd);
     }
     *file_size = sb.st_size;
-    *file_content = mmap(NULL, *file_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    file_content = mmap(NULL, *file_size, PROT_READ, MAP_PRIVATE, fd, 0);
     if (file_content == MAP_FAILED) {
         return fail_with("Error mapping file", fd);
     }

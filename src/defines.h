@@ -5,6 +5,7 @@
 #define strncpy_s(a, b, c, d) strncpy(a, c, d)
 #define _itoa_s(a, b, c, d) itoa(a, b, d)
 #define _strdup(a) strdup(a)
+#define memcpy_s(a, b, c, d) memcpy(a, c, d)
 #endif
 
 #ifdef _WIN32

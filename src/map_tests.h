@@ -27,7 +27,9 @@ int test_map_big_insert(void)
                    data,
                    MAP_TEST_BIG_LEN);
 #ifndef _WIN32
-    int res = (!strncmp(map_get(&test_map, &key)->data,
+    struct map_data_entry comp = {};
+    map_get(&test_map, &key, &comp);
+    int res = (!strncmp(comp.data,
                         data,
                         MAP_TEST_BIG_LEN));
     destroy_map(&test_map);
@@ -56,9 +58,11 @@ int test_map_small_insert(void)
                    MAP_TEST_SMALL_LEN);
 
 #ifndef _WIN32
-    int res = (!strncmp(map_get(&test_map, &key)->data,
+    struct map_data_entry comp = {};
+    map_get(&test_map, &key, &comp);
+    int res = (!strncmp(comp.data,
                         data,
-                        MAP_TEST_SMALL_LEN));
+                        MAP_TEST_BIG_LEN));
     destroy_map(&test_map);
     return res;
 #else

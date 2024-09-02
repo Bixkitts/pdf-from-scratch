@@ -2,6 +2,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 #include <ctype.h>
 
@@ -159,7 +160,7 @@ char *strsep(char **stringp, const char *delim) {
 	*stringp = ptr + 1;
 	return start;
 }
-#elif
+#else
 char *strpbrk(const char *str, const char *ctrl) {
 	const char *res = str;
 	while (*(res) != '\0') {
