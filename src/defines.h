@@ -10,8 +10,8 @@
 #endif
 
 #ifdef _WIN32
-#define strdup(a) _strdup(a)
-#define restrict __restrict
+#define strdup(a)           _strdup(a)
+#define restrict            __restrict
 #define aligned_alloc(a, b) _aligned_malloc(b, a)
 #define aligned_free(a)     _aligned_free(a)
 #endif
