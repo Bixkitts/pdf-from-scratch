@@ -161,7 +161,7 @@ struct subsection_heading get_next_section(struct subsection_heading section, co
 	const char *nl = strstr(res.begin, "\n");
 	const char *sp = strstr(res.begin, " ");
 #ifndef SOFT_FAIL
-	if (sp > nl) exit(1);
+	if (sp > nl)         exit(1);
 	if (res.begin > eof) exit(1);
 #endif
 	res.first_obj_num = strtoull_helper((char*)res.begin);

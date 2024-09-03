@@ -245,11 +245,10 @@ int map_cpy_insert(struct map *out_map,
     long long slot = map_get_slot_from_key(out_map,
                                            in_key);
     if(slot < 0) {
-        if(!!map_resize(out_map,
+        if(map_resize(out_map,
                         out_map->capacity * MAP_GROWTH_FACTOR)) {
             return -1;
         }
-        // Will always succeed on first recursion
         map_cpy_insert (out_map,
                         in_key,
                         data,
@@ -260,7 +259,7 @@ int map_cpy_insert(struct map *out_map,
     map_try_store_key(out_map, slot, in_key);
 
     char **dest = &out_map->data[slot].data;
-    *dest = malloc(data_size * sizeof(char));
+    *dest = cooler_malloc(data_size * sizeof(char));
     if(!*dest) {
         exit(1);
     }
@@ -276,11 +275,10 @@ int map_mov_insert(struct map *out_map,
     long long slot = map_get_slot_from_key(out_map,
                                            in_key);
     if(slot < 0) {
-        if(!!map_resize(out_map,
+        if(map_resize(out_map,
                         out_map->capacity * MAP_GROWTH_FACTOR)) {
             return -1;
         }
-        // Will always succeed on first recursion
         map_mov_insert (out_map,
                         in_key,
                         data,
@@ -312,7 +310,6 @@ void map_erase_index(struct map *out_map,
     out_map->count--;
     size_t shrink = out_map->capacity / MAP_SHRINK_FACTOR;
     if(out_map->count < ((long long)shrink / 2)) {
-        // Shrinking should always succeed
         map_resize(out_map, shrink);
     }
 }
@@ -327,13 +324,15 @@ void map_erase(struct map *out_map,
     map_erase_index(out_map, index);
 }
 
-long long map_get(const struct map *out_map,
+long long map_get_index(const struct map *out_map,
                   const struct map_key *in_key,
                   struct map_data_entry **out_data)
 {
     long long index = map_find_key(out_map, in_key);
     if(index >= 0) {
-        *out_data = &out_map->data[index];
+        if (NULL != out_data) {
+            *out_data = &out_map->data[index];
+        }
         return index;
     }
     return -1;

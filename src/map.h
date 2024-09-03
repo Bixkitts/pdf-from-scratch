@@ -9,7 +9,7 @@
 #define MAP_GROWTH_FACTOR  2
 #define MAP_SHRINK_FACTOR  2
 
-// MUST be 32, always, because of
+// MUST be 32, because of
 // AVX 256
 #define MAP_SMALL_STR_SIZE 32
 
@@ -53,7 +53,6 @@ struct __attribute__((packed)) map {
     long long              capacity;
 };
 
-// crashes on failure to allocate
 void new_map     (struct map *out_map);
 
 void destroy_map (struct map *out_map);
@@ -84,12 +83,6 @@ void  map_erase       (struct map *out_map,
 void  map_erase_index (struct map *out_map,
                        long long index);
 
-/* Returns the index to the object in the   *
- * map, and sets out_data to point to it.   *
- * If the key is not found, the function    *
- * returns -1 and doesn't modify out_data.  *
- * Pass the returned index to               *
- * map_erase_index().                       */
-long long map_get (const struct map *in_map,
+long long map_get_index (const struct map *in_map,
                    const struct map_key *in_key,
                    struct map_data_entry **out_data);
