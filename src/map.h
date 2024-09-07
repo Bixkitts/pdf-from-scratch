@@ -9,9 +9,11 @@
 #define MAP_GROWTH_FACTOR  2
 #define MAP_SHRINK_FACTOR  2
 
-// MUST be 32, because of
-// AVX 256
+// Currently must be <=32, because of
+// AVX2 registers
 #define MAP_SMALL_STR_SIZE 32
+
+typedef long long map_index_t;
 
 struct map_data_entry {
     char   *data;
@@ -21,19 +23,9 @@ struct map_key {
     char   *string;
     size_t  len;
 };
-// TODO:
-// Could mb do smthn like this,
-// because the map member
-// "data" points to allocated
-// memory pool for the whole
-// struct:
-//
-// union map_data {
-//     struct map_data_entry *data;
-//     void *memory;
-// };
-//
+
 #ifdef _WIN32
+#pragma pack(push,1)
 struct map {
 #else
 struct __attribute__((packed)) map {
@@ -42,47 +34,29 @@ struct __attribute__((packed)) map {
     struct map_key        *keys;
     // A block of memory for short
     // strings (MAP_SMALL_STR_SIZE)
-    // so they are contiguous
-    // and can be eaten by search
-    // algos
+    // where they are stored contiguously
     char                  *short_key_store;
     long long              count;
-    // Map inserting and erasing will
-    // increase or decrease the capacity
-    // and reallocate accordingly
     long long              capacity;
 };
+#ifdef _WIN32
+#pragma push(pop)
+#endif
 
-void new_map     (struct map *out_map);
-
-void destroy_map (struct map *out_map);
-
-/* This function copies data it             *
- * inserts.                                 *
- * Returns -1 on failure (map full)         */
-int   map_cpy_insert  (struct map *out_map,
-                       const struct map_key *in_key,
-                       const char *restrict data,
-                       size_t data_size);
-
-/* This function takes ownership of         *
- * the data it's passed.                    *
- * Returns -1 on failure (map full)         */
-int   map_mov_insert  (struct map *out_map,
-                       const struct map_key *in_key,
-                       char *data,
-                       size_t data_size);
-
-/* Remember to get and destroy objects      *
- * before erasing them.                     */
-void  map_erase       (struct map *out_map,
-                       const struct map_key *in_key);
-/* Index is NOT checked,                *
- * will crash the program if invalid.   *
- * Use index returned from map_get.     */
-void  map_erase_index (struct map *out_map,
-                       long long index);
-
-long long map_get_index (const struct map *in_map,
-                   const struct map_key *in_key,
-                   struct map_data_entry **out_data);
+void        new_map         (struct map *out_map);
+void        destroy_map     (struct map *out_map);
+int         map_cpy_insert  (struct map *out_map,
+                             const struct map_key *in_key,
+                             const char *restrict data,
+                             size_t data_size);
+int         map_mov_insert  (struct map *out_map,
+                             const struct map_key *in_key,
+                             char *data,
+                             size_t data_size);
+void        map_erase       (struct map *out_map,
+                             const struct map_key *in_key);
+void        map_erase_index (struct map *out_map,
+                             map_index_t index);
+map_index_t map_get         (const struct map *in_map,
+                             const struct map_key *in_key,
+                             struct map_data_entry **out_data);
