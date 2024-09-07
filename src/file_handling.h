@@ -1,7 +1,7 @@
 #ifdef _WIN32
-    #include <windows.h>
+#include <windows.h>
 #else
-    #include <fcntl.h>
+#include <fcntl.h>
 #endif
 
 #include <stdio.h>
@@ -14,13 +14,9 @@ struct line_info {
     size_t line_length;
 };
 
-void             *memory_map_file    (const char *filename,
-                                      size_t *file_size);
-struct line_info *parse_file         (char *file_content,
-                                      size_t file_size,
-                                      size_t *num_lines);
-int               write_data_to_file (const char *filename,
-                                      const char *data);
-void              unmap_file          (void *file_content,
-                                       size_t file_size);
-
+void *memory_map_file(const char *filename, size_t *file_size);
+struct line_info *parse_file(char *file_content,
+                             size_t file_size,
+                             size_t *num_lines);
+int write_data_to_file(const char *filename, const char *data);
+void unmap_file(void *file_content, size_t file_size);
