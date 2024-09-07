@@ -13,6 +13,7 @@
 // AVX2 registers
 #define MAP_SMALL_STR_SIZE 32
 
+// Error if <0 or >MAP_MAX_CAPACITY
 typedef long long map_index_t;
 
 struct map_data_entry {
@@ -36,8 +37,8 @@ struct __attribute__((packed)) map {
     // strings (MAP_SMALL_STR_SIZE)
     // where they are stored contiguously
     char *short_key_store;
-    long long count;
-    long long capacity;
+    map_index_t count;
+    map_index_t capacity;
 };
 #ifdef _WIN32
 #pragma push(pop)

@@ -17,9 +17,9 @@
 #include "map.h"
 #include "mem_utils.h"
 
-static long long map_get_empty_slot(const struct map *map)
+static map_index_t map_get_empty_index(const struct map *map)
 {
-    for (long long i = 0; i < map->capacity; i++) {
+    for (map_index_t i = 0; i < map->capacity; i++) {
         if (map->keys[i].string == NULL) {
             return i;
         }
@@ -65,8 +65,8 @@ static int find_32byte_chunk(const char *array,
 
 /* Returns the index in the map,     *
  * or -1 on failure to find the key. */
-static long long map_find_key(const struct map *map,
-                              const struct map_key *restrict in_key)
+static map_index_t map_find_key(const struct map *map,
+                                const struct map_key *restrict in_key)
 {
 // TODO: #ifdef in a function is not pretty
 #ifdef __AVX2__
@@ -84,7 +84,7 @@ static long long map_find_key(const struct map *map,
     // (falls back to this)
     // Should still be very fast
     // because we skip unequal string lengths.
-    for (long long i = 0; i < map->capacity; i++) {
+    for (map_index_t i = 0; i < map->capacity; i++) {
         const struct map_key *key = &map->keys[i];
         if (key->len != in_key->len) {
             continue;
@@ -98,12 +98,12 @@ static long long map_find_key(const struct map *map,
     return -1;
 }
 
-static long long map_get_slot_from_key(const struct map *in_map,
-                                       const struct map_key *in_key)
+static map_index_t map_get_index_from_key(const struct map *in_map,
+                                          const struct map_key *in_key)
 {
-    long long slot = map_find_key(in_map, in_key);
+    map_index_t slot = map_find_key(in_map, in_key);
     if (slot < 0) {
-        slot = map_get_empty_slot(in_map);
+        slot = map_get_empty_index(in_map);
     }
     return slot;
 }
@@ -208,25 +208,25 @@ void destroy_map(struct map *out_map)
  * it needs to be explicitly erased     *
  * first                                */
 static void map_try_store_key(struct map *out_map,
-                              long long slot,
+                              map_index_t index,
                               const struct map_key *in_key)
 {
-    if (out_map->keys[slot].string) {
+    if (out_map->keys[index].string) {
         return;
     }
-    out_map->keys[slot].len = in_key->len;
+    out_map->keys[index].len = in_key->len;
     if (in_key->len <= MAP_SMALL_STR_SIZE) {
-        out_map->keys[slot].string =
-            &out_map->short_key_store[slot * MAP_SMALL_STR_SIZE];
-        memcpy(out_map->keys[slot].string, in_key->string, in_key->len);
+        out_map->keys[index].string =
+            &out_map->short_key_store[index * MAP_SMALL_STR_SIZE];
+        memcpy(out_map->keys[index].string, in_key->string, in_key->len);
         return;
     }
 
-    out_map->keys[slot].string = calloc(in_key->len, sizeof(char));
-    if (!out_map->keys[slot].string) {
+    out_map->keys[index].string = calloc(in_key->len, sizeof(char));
+    if (!out_map->keys[index].string) {
         exit(1);
     }
-    memcpy(out_map->keys[slot].string, in_key->string, in_key->len);
+    memcpy(out_map->keys[index].string, in_key->string, in_key->len);
 }
 
 int map_cpy_insert(struct map *out_map,
@@ -234,18 +234,18 @@ int map_cpy_insert(struct map *out_map,
                    const char *restrict data,
                    size_t data_size)
 {
-    long long slot = map_get_slot_from_key(out_map, in_key);
-    if (slot < 0) {
+    map_index_t index = map_get_index_from_key(out_map, in_key);
+    if (index < 0) {
         if (map_resize(out_map, out_map->capacity * MAP_GROWTH_FACTOR)) {
             return -1;
         }
         map_cpy_insert(out_map, in_key, data, data_size);
     }
     out_map->count++;
-    out_map->data[slot].len = data_size;
-    map_try_store_key(out_map, slot, in_key);
+    out_map->data[index].len = data_size;
+    map_try_store_key(out_map, index, in_key);
 
-    char **dest = &out_map->data[slot].data;
+    char **dest = &out_map->data[index].data;
     *dest       = cooler_malloc(data_size * sizeof(char));
     if (!*dest) {
         exit(1);
@@ -259,21 +259,21 @@ int map_mov_insert(struct map *out_map,
                    char *data,
                    size_t data_size)
 {
-    long long slot = map_get_slot_from_key(out_map, in_key);
-    if (slot < 0) {
+    map_index_t index = map_get_index_from_key(out_map, in_key);
+    if (index < 0) {
         if (map_resize(out_map, out_map->capacity * MAP_GROWTH_FACTOR)) {
             return -1;
         }
         map_mov_insert(out_map, in_key, data, data_size);
     }
-    map_try_store_key(out_map, slot, in_key);
+    map_try_store_key(out_map, index, in_key);
     out_map->count++;
-    out_map->data[slot].len  = data_size;
-    out_map->data[slot].data = data;
+    out_map->data[index].len  = data_size;
+    out_map->data[index].data = data;
     return 0;
 }
 
-void map_erase_index(struct map *out_map, long long index)
+void map_erase_index(struct map *out_map, map_index_t index)
 {
     free(out_map->data[index].data);
     memset(&out_map->data[index], 0, sizeof(*out_map->data));
@@ -288,25 +288,25 @@ void map_erase_index(struct map *out_map, long long index)
     memset(&out_map->keys[index], 0, sizeof(*out_map->keys));
     out_map->count--;
     size_t shrink = out_map->capacity / MAP_SHRINK_FACTOR;
-    if (out_map->count < ((long long)shrink / 2)) {
+    if (out_map->count < ((map_index_t)shrink / 2)) {
         map_resize(out_map, shrink);
     }
 }
 
 void map_erase(struct map *out_map, const struct map_key *in_key)
 {
-    long long index = map_find_key(out_map, in_key);
+    map_index_t index = map_find_key(out_map, in_key);
     if (index < 0) {
         return;
     }
     map_erase_index(out_map, index);
 }
 
-long long map_get_index(const struct map *out_map,
-                        const struct map_key *in_key,
-                        struct map_data_entry **out_data)
+map_index_t map_get(const struct map *out_map,
+                    const struct map_key *in_key,
+                    struct map_data_entry **out_data)
 {
-    long long index = map_find_key(out_map, in_key);
+    map_index_t index = map_find_key(out_map, in_key);
     if (index >= 0) {
         if (NULL != out_data) {
             *out_data = &out_map->data[index];
