@@ -15,4 +15,3 @@
 #define aligned_alloc(a, b) _aligned_malloc(b, a)
 #define aligned_free(a)     _aligned_free(a)
 #endif
-

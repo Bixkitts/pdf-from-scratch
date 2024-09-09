@@ -104,10 +104,7 @@ int write_data_to_file(const char *data, size_t size, const char *fs_dir)
         perror("Error opening file");
         return -1;
     }
-    size_t written_size = fwrite(data,
-                                 sizeof(char),
-                                 size,
-                                 new_file);
+    size_t written_size = fwrite(data, sizeof(char), size, new_file);
     if (written_size != size) {
         perror("Error writing to file");
         fclose(new_file);

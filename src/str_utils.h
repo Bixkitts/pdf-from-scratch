@@ -60,5 +60,8 @@ char *strpbrk(const char *str, const char *ctrl);
 
 int count_for_split_str_by_whitespace(char *str, size_t str_len);
 
-int split_string_by_whitespace(char *str, char **out, size_t str_len, int count);
+int split_string_by_whitespace(char *str,
+                               char **out,
+                               size_t str_len,
+                               int count);
 char *str_replace(const char *orig, const char *rep, const char *with);

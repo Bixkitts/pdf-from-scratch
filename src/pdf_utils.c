@@ -1,6 +1,6 @@
 #include "pdf_utils.h"
 
-const char *obsraj = "0000000000 65535 f";
+const char *obsraj         = "0000000000 65535 f";
 const char *pdf_str_header = "%PDF-2.0\nPOOP\n";
 const char *pdf_str_metadata =
     "7 0 obj\n" // %Document metadata
@@ -76,22 +76,22 @@ const char *pdf_str_catalog_pages =
     "/Count 1\n"
     ">>\n"
     "endobj\n";
-const char *pdf_str_pages[] = {"3 0 obj\n", // %Page dictionary
-                               "<<",
-                               "/Type /Page\n"
-                               "/Parent 2 0 R\n"
-                               "/MediaBox [0 0 612 792]\n"
-                               "/Contents 4 0 R\n"
-                               "/Resources "
-                               "<<"
-                               "/Font "
-                               "<<"
-                               "/F1 5 0 R\n" // %Internal ref, not font name
-                               "/F2 6 0 R\n" // %Internal ref, not font name
-                               ">>\n"
-                               ">>\n",
-                               ">>\n",
-                               "endobj\n"};
+const char *pdf_str_pages[]        = {"3 0 obj\n", // %Page dictionary
+                                      "<<",
+                                      "/Type /Page\n"
+                                             "/Parent 2 0 R\n"
+                                             "/MediaBox [0 0 612 792]\n"
+                                             "/Contents 4 0 R\n"
+                                             "/Resources "
+                                             "<<"
+                                             "/Font "
+                                             "<<"
+                                             "/F1 5 0 R\n" // %Internal ref, not font name
+                                      "/F2 6 0 R\n" // %Internal ref, not font name
+                                      ">>\n"
+                                             ">>\n",
+                                      ">>\n",
+                                      "endobj\n"};
 const char *pdf_str_page_content[] = {
     "4 0 obj\n" // %Page contents for page 1
     "<<"

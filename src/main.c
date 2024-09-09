@@ -4,9 +4,9 @@
 
 #include "file_handling.h"
 
+#include "converters.h"
 #include "dict_util_tests.h"
 #include "map_tests.h"
-#include "converters.h"
 #include "pdf_tests.h"
 #include "str_util_tests.h"
 
@@ -25,17 +25,17 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
     }
     struct mapped_file test_md = {};
-    if(memory_map_file("./test.md", &test_md) == FILE_MAP_FAIL) {
+    if (memory_map_file("./test.md", &test_md) == FILE_MAP_FAIL) {
         fprintf(stderr, "File mapping failed\n");
         return EXIT_FAILURE;
     }
-    char *pdf = NULL;
+    char *pdf      = NULL;
     size_t pdf_len = convert_md_to_pdf(test_md.data, test_md.size, &pdf);
     if (pdf_len == CONVERSION_FAILED) {
         fprintf(stderr, "MD to PDF conversion failed\n");
         return EXIT_FAILURE;
     }
-    if(write_data_to_file(pdf, pdf_len, "./test.pdf") == FILE_WRITE_FAIL) {
+    if (write_data_to_file(pdf, pdf_len, "./test.pdf") == FILE_WRITE_FAIL) {
         fprintf(stderr, "Writing output failed\n");
         return EXIT_FAILURE;
     }
@@ -55,4 +55,3 @@ static void do_tests(void)
     volatile int i = scanf("%c", &ch);
     i++;
 }
-
