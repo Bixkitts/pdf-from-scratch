@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,10 +16,12 @@
 #include "file_handling.h"
 #include "mem_utils.h"
 
+static int fail_with(const char *message, int fd);
+
 #ifdef _WIN32
-void *memory_map_file(const char *filename, size_t *file_size)
+int memory_map_file(const char *dir, struct mapped_file *out_mf)
 {
-    HANDLE hFile = CreateFileA(filename,
+    HANDLE hFile = CreateFileA(dir,
                                GENERIC_READ,
                                0,
                                NULL,
@@ -27,123 +30,90 @@ void *memory_map_file(const char *filename, size_t *file_size)
                                NULL);
     if (hFile == INVALID_HANDLE_VALUE) {
         perror("Error opening file");
-        return NULL;
+        return -1;
     }
 
-    *file_size = GetFileSize(hFile, NULL);
+    out_mf->size = GetFileSize(hFile, NULL);
     HANDLE hMapping =
         CreateFileMappingA(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
-    if (hMapping == NULL) {
+    if (!hMapping) {
         perror("Error creating file mapping");
         CloseHandle(hFile);
-        return NULL;
+        return -1;
     }
 
-    void *file_content = MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0);
-    if (file_content == NULL) {
+    out_mf->data = MapViewOfFile(hMapping, FILE_MAP_READ, 0, 0, 0);
+    if (!out_mf->data) {
         perror("Error mapping view of file");
         CloseHandle(hMapping);
         CloseHandle(hFile);
-        return NULL;
+        return -1;
     }
 
     CloseHandle(hMapping);
     CloseHandle(hFile);
 
-    return file_content;
+    return 0;
 }
 
-void unmap_file(void *file_content, size_t file_size)
+void unmap_file(struct mapped_file *mf)
 {
-    UnmapViewOfFile(file_content);
+    UnmapViewOfFile(mf->data);
+    mf->size = 0;
 }
 #else
 
-void *fail_with(const char *message, int fd)
+static int fail_with(const char *message, int fd)
 {
     perror(message);
     if (fd != -1)
         close(fd);
-    return NULL;
+    return -1;
 }
 
-void *memory_map_file(const char *filename, size_t *file_size)
+int memory_map_file(const char *dir, struct mapped_file *out_mf)
 {
-    int fd = open(filename, O_RDONLY);
+    int fd = open(dir, O_RDONLY);
     struct stat sb;
-    void *file_content;
     if (fd == -1) {
         return fail_with("Error opening file", fd);
     }
     if (fstat(fd, &sb) == -1) {
         return fail_with("Error getting file size", fd);
     }
-    *file_size   = sb.st_size;
-    file_content = mmap(NULL, *file_size, PROT_READ, MAP_PRIVATE, fd, 0);
-    if (file_content == MAP_FAILED) {
+    out_mf->size = sb.st_size;
+    out_mf->data = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    if (out_mf->data == MAP_FAILED) {
         return fail_with("Error mapping file", fd);
     }
     close(fd);
-    return file_content;
+    return 0;
 }
 
-void unmap_file(void *file_content, size_t file_size)
+void unmap_file(struct mapped_file *mf)
 {
-    munmap(file_content, file_size);
+    munmap(mf->data, mf->size);
+    mf->size = 0;
 }
 #endif
 
-// Function to read file contents and find lines starting with '#'
-struct line_info *parse_file(char *file_content,
-                             size_t file_size,
-                             size_t *num_lines)
+int write_data_to_file(const char *data, size_t size, const char *fs_dir)
 {
-    size_t capacity         = 10;
-    struct line_info *lines = cooler_malloc(capacity * sizeof(*lines));
-
-    size_t line_index = 0;
-    char *line_start  = file_content;
-    for (size_t i = 0; i < file_size; i++) {
-        if (file_content[i] == '\n' || i == file_size - 1) {
-            size_t line_length = &file_content[i] - line_start + 1;
-
-            if (line_start[0] == '#') {
-                if (*num_lines >= capacity) {
-                    capacity *= 2;
-                    lines = cooler_realloc(lines, capacity * sizeof(*lines));
-                }
-
-                lines[*num_lines].line_index  = line_index;
-                lines[*num_lines].line_length = line_length;
-                (*num_lines)++;
-            }
-
-            line_index++;
-            line_start = &file_content[i + 1];
-        }
-    }
-
-    return lines;
-}
-
-int write_buffer_to_file(const char *filename, const char *data)
-{
-    FILE *file = fopen(filename, "w+");
-    if (file == NULL) {
+    FILE *new_file = fopen(fs_dir, "w+");
+    if (!new_file) {
         perror("Error opening file");
         return -1;
     }
-
-    size_t buffer_size = strlen(data);
-
-    size_t written_size = fwrite(data, sizeof(char), buffer_size, file);
-    if (written_size != buffer_size) {
+    size_t written_size = fwrite(data,
+                                 sizeof(char),
+                                 size,
+                                 new_file);
+    if (written_size != size) {
         perror("Error writing to file");
-        fclose(file);
+        fclose(new_file);
         return -1;
     }
 
-    fclose(file);
-
+    fclose(new_file);
     return 0;
 }

@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef _WIN32
 #include <windows.h>
 #else
@@ -6,17 +8,14 @@
 
 #include <stdio.h>
 
-/* Indexes to lines beginning with '#'
- * and their length
- */
-struct line_info {
-    size_t line_index;
-    size_t line_length;
+#define FILE_MAP_FAIL   -1
+#define FILE_WRITE_FAIL -1
+
+struct mapped_file {
+    void *data;
+    size_t size;
 };
 
-void *memory_map_file(const char *filename, size_t *file_size);
-struct line_info *parse_file(char *file_content,
-                             size_t file_size,
-                             size_t *num_lines);
-int write_data_to_file(const char *filename, const char *data);
-void unmap_file(void *file_content, size_t file_size);
+int memory_map_file(const char *dir, struct mapped_file *out_mf);
+int write_data_to_file(const char *data, size_t size, const char *dir);
+void unmap_file(struct mapped_file *mf);
