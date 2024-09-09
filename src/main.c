@@ -25,16 +25,16 @@ static int md_to_pdf(const char *file_in, const char *file_out);
 int main(int argc, char *argv[])
 {
     switch (parse_arguments(argc, argv)) {
-        case OP_DO_TESTS:
-            do_tests();
-            break;
-        case OP_MD_TO_PDF:
-            if(md_to_pdf(argv[1], argv[2]) == -1) {
-                return EXIT_FAILURE;
-            };
-            break;
-        default:
-            fprintf(stderr, "Usage: %s <markdown input> <pdf output>\n", argv[0]);
+    case OP_DO_TESTS:
+        do_tests();
+        break;
+    case OP_MD_TO_PDF:
+        if (md_to_pdf(argv[1], argv[2]) == -1) {
+            return EXIT_FAILURE;
+        };
+        break;
+    default:
+        fprintf(stderr, "Usage: %s <markdown input> <pdf output>\n", argv[0]);
     };
     return EXIT_SUCCESS;
 }

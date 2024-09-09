@@ -9,7 +9,7 @@
 #include "mem_utils.h"
 #include "str_utils.h"
 
-#define get_obj_length1(obj_strarr)                                            \
+#define get_obj_length1(obj_strarr) \
     get_obj_length(obj_strarr, STARRLEN(obj_strarr), NULL)
 #define get_obj_length2(obj_strarr, len) get_obj_length(obj_strarr, len, NULL)
 
