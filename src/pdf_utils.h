@@ -37,12 +37,7 @@ struct subsection_heading {
  */
 size_t get_obj_length(const char *obj_strarr[], size_t len, size_t lengths[]);
 char *get_with_delim(const char *str);
-int replace_label_in_obj(char *obj_strarr[],
-                         int len,
-                         const char *label,
-                         const char *replace);
 size_t get_stream_length(const char *obj_strarr[], int len);
-size_t obj_join(char **out, const char *obj_strarr[], size_t len);
 const char *find_cross_reference_section(const char *file_content,
                                          size_t content_len);
 const char *find_trailer(const char *xref_tag_ptr, const char *eof);
@@ -66,3 +61,13 @@ void write_font_dictionary(struct pdf *out_pdf);
 void write_catalog(struct pdf *out_pdf);
 void write_pages_catalog(struct pdf *out_pdf);
 void write_page_dictionary(struct pdf *out_pdf);
+
+/*
+ * Other PDF Utilities
+ * --------------------------------------------
+ */
+size_t obj_join(char **out, const char *obj_strarr[], size_t len);
+int replace_label_in_obj(char *obj_strarr[],
+                         int len,
+                         const char *label,
+                         const char *replace);
