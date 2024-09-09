@@ -15,7 +15,7 @@ static void do_tests(void);
 int main(int argc, char *argv[])
 {
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s <filename>\n", argv[0]);
+        fprintf(stderr, "Usage: %s <markdown input> <pdf output>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
     }
     struct mapped_file test_md = {};
-    if (memory_map_file("./test.md", &test_md) == FILE_MAP_FAIL) {
+    if (memory_map_file(argv[1], &test_md) == FILE_MAP_FAIL) {
         fprintf(stderr, "File mapping failed\n");
         return EXIT_FAILURE;
     }
@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
         fprintf(stderr, "MD to PDF conversion failed\n");
         return EXIT_FAILURE;
     }
-    if (write_data_to_file(pdf, pdf_len, "./test.pdf") == FILE_WRITE_FAIL) {
+    if (write_data_to_file(pdf, pdf_len, argv[2]) == FILE_WRITE_FAIL) {
         fprintf(stderr, "Writing output failed\n");
         return EXIT_FAILURE;
     }
