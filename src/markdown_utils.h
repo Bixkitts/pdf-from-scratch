@@ -16,7 +16,7 @@ struct md_parse_result {
     size_t *lengths;
 };
 
-int parse_markdown(const struct md_delimiter *delim,
+int parse_markdown(const struct md_delimiter *delims,
                    int delim_count,
                    struct md_parse_result *out_result);
 void delete_md_parse_result(struct md_parse_result *result);

@@ -34,9 +34,18 @@ int test_split_string_by_whitespace(void)
     return strcmp(strs[6], "g") == 0;
 }
 
+int test_str_reverse(void)
+{
+    char *test_str = "hello world.";
+    char *correct_result = ".dlrow olleh";
+    str_rev(test_str);
+    return !!strcmp(test_str, correct_result);
+}
+
 void do_str_utils_tests(void)
 {
     RUNTEST(test_count_for_split_str_by_whitespace);
     RUNTEST(test_split_string_by_whitespace);
     RUNTEST(test_str_replace);
+    RUNTEST(test_str_reverse);
 }
