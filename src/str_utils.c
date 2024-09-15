@@ -19,6 +19,76 @@ void str_rev(char *str)
     }
 }
 
+static void str_search_compute_lps(const char* needle, int m, int* lps) 
+{
+    int len = 0;
+    lps[0]  = 0;
+    int i   = 1;
+    while (i < m) {
+        if (needle[i] == needle[len]) {
+            len++;
+            lps[i] = len;
+            i++;
+        }
+        else {
+            if (len != 0) {
+                len = lps[len - 1];
+            }
+            else {
+                lps[i] = 0;
+                i++;
+            }
+        }
+    }
+}
+
+/*
+ * KMP algorithm
+ */
+int str_search(const char *haystack, const char *needle)
+{
+    int haystack_len = strlen(haystack);
+    int needle_len   = strlen(needle);
+    int *lps         = NULL;
+    bool lps_alloc   = false;
+    if(needle_len <= SHORT_STR_LEN) {
+        int lps_stack[SHORT_STR_LEN * sizeof(int)] = {}; 
+        lps = lps_stack;
+    }
+    else {
+        lps = cooler_malloc(sizeof(*lps) * needle_len);
+        lps_alloc = true;
+    }
+
+    str_search_compute_lps(needle, needle_len, lps);
+
+    int i = 0;
+    int j = 0;
+    while (i < haystack_len && i < needle_len) {
+        if (needle[j] == haystack[i]) {
+            j++;
+            i++;
+        }
+        if (j == needle_len) {
+            if(lps_alloc) {
+                free(lps);
+            }
+            return i - j;
+        } else if (i < haystack_len && needle[j] != haystack[i]) {
+            if (j != 0) {
+                j = lps[j - 1];
+            }
+            else {
+                i++;
+            }
+        }
+    }
+    if(lps_alloc) {
+        free(lps);
+    }
+    return -1;
+}
+
 #ifndef _WIN32
 // TODO: optimise test and verify
 char *itoa(int value, char *str, int base)

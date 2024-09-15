@@ -2,8 +2,13 @@
 
 #include <stdio.h>
 
+// Fixed str width we can do optimisations on
+#define SHORT_STR_LEN 32
+
 // TODO: optimise test and verify
 void str_rev(char *str);
+
+int str_search(const char *haystack, const char *needle);
 
 #ifndef _WIN32
 // TODO: optimise test and verify
