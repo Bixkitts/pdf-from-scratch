@@ -36,7 +36,7 @@ int test_split_string_by_whitespace(void)
 
 int test_str_reverse(void)
 {
-    char *test_str = "hello world.";
+    char *test_str       = "hello world.";
     char *correct_result = ".dlrow olleh";
     str_rev(test_str);
     return !!strcmp(test_str, correct_result);

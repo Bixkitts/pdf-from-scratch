@@ -9,5 +9,4 @@ int parse_markdown(const struct md_delimiter *delim,
 
 void delete_md_parse_result(struct md_parse_result *result)
 {
-
 }

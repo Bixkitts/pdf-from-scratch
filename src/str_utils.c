@@ -19,7 +19,7 @@ void str_rev(char *str)
     }
 }
 
-static void str_search_compute_lps(const char* needle, int m, int* lps) 
+static void str_search_compute_lps(const char *needle, int m, int *lps)
 {
     int len = 0;
     lps[0]  = 0;
@@ -51,12 +51,12 @@ int str_search(const char *haystack, const char *needle)
     int needle_len   = strlen(needle);
     int *lps         = NULL;
     bool lps_alloc   = false;
-    if(needle_len <= SHORT_STR_LEN) {
-        int lps_stack[SHORT_STR_LEN * sizeof(int)] = {}; 
-        lps = lps_stack;
+    if (needle_len <= SHORT_STR_LEN) {
+        int lps_stack[SHORT_STR_LEN * sizeof(int)] = {};
+        lps                                        = lps_stack;
     }
     else {
-        lps = cooler_malloc(sizeof(*lps) * needle_len);
+        lps       = cooler_malloc(sizeof(*lps) * needle_len);
         lps_alloc = true;
     }
 
@@ -70,11 +70,12 @@ int str_search(const char *haystack, const char *needle)
             i++;
         }
         if (j == needle_len) {
-            if(lps_alloc) {
+            if (lps_alloc) {
                 free(lps);
             }
             return i - j;
-        } else if (i < haystack_len && needle[j] != haystack[i]) {
+        }
+        else if (i < haystack_len && needle[j] != haystack[i]) {
             if (j != 0) {
                 j = lps[j - 1];
             }
@@ -83,7 +84,7 @@ int str_search(const char *haystack, const char *needle)
             }
         }
     }
-    if(lps_alloc) {
+    if (lps_alloc) {
         free(lps);
     }
     return -1;
