@@ -1,9 +1,11 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "file_handling.h"
 
+#include "bench_funcs.h"
 #include "benchmark.h"
 #include "converters.h"
 #include "dict_util_tests.h"
@@ -22,6 +24,7 @@ enum operation {
 };
 
 static void do_tests(void);
+static void do_all_benchmarks();
 static enum operation parse_arguments(int argc, char *argv[]);
 static int md_to_pdf(const char *file_in, const char *file_out);
 
@@ -91,4 +94,20 @@ static void do_tests(void)
     printf("Press ENTER key to Continue\n");
     volatile int i = scanf("%c", &ch);
     i++;
+}
+
+static void do_all_benchmarks()
+{
+    const int str_search_sample_count = 1000;
+    srand(time(NULL));
+    run_benchmark(bench_strstr,
+                  bench_gen_haystack_1,
+                  bench_haystack_1_cleanup,
+                  str_search_sample_count,
+                  "strstr()");
+    run_benchmark(bench_cooler_strstr,
+                  bench_gen_haystack_1,
+                  bench_haystack_1_cleanup,
+                  str_search_sample_count,
+                  "cooler_strstr()");
 }
