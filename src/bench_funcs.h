@@ -34,16 +34,14 @@ void bench_haystack_1_cleanup(void **input, size_t input_len)
     free(*input);
 }
 
-int bench_strstr(void *input, size_t in_len)
+long long bench_strstr(void *input, size_t in_len)
 {
     const char *needle = "needle";
     return (long long)strstr((char *)input, needle);
-    return 0;
 }
 
-int bench_cooler_strstr(void *input, size_t in_len)
+long long bench_cooler_strstr(void *input, size_t in_len)
 {
     const char *needle = "needle";
-    cooler_strstr((char *)input, needle);
-    return 0;
+    return (long long)cooler_strstr((char *)input, needle);
 }

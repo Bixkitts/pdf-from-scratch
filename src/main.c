@@ -98,7 +98,7 @@ static void do_tests(void)
 
 static void do_all_benchmarks()
 {
-    const int str_search_sample_count = 1000;
+    const int str_search_sample_count = 100000;
     srand(time(NULL));
     print_benchmark(run_benchmark(bench_strstr,
                                   bench_gen_haystack_1,

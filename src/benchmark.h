@@ -15,7 +15,7 @@ typedef size_t (*benchmark_input_gen)(void **input, int sample_iter);
 
 // Pass the input and size to a benchmark function,
 // always return 0.
-typedef int (*benchmark_fn)(void *input, size_t input_len);
+typedef long long (*benchmark_fn)(void *input, size_t input_len);
 
 // This will be called after all benchmark
 // samples to clean up allocated memory
@@ -34,9 +34,7 @@ typedef double bench_clock_ms_t;
 // TODO: idk how this is on windows
 typedef double bench_clock_ms_t;
 #endif
-void print_benchmark(bench_clock_ms_t result,
-                     int sample_count,
-                     const char *name);
+void print_benchmark(bench_clock_ms_t result, int sample_count, const char *name);
 bench_clock_ms_t run_benchmark(benchmark_fn bench_fn,
                                benchmark_input_gen input_gen,
                                benchmark_input_cleanup input_clean,

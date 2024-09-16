@@ -24,7 +24,7 @@ bench_clock_ms_t run_benchmark(benchmark_fn bench_fn,
     for (int i = 0; i < sample_count; i++) {
         in_len          = input_gen(&input, i);
         benchmark_begin = clock();
-        volatile int nop =
+        volatile long long nop =
             bench_fn(input, in_len); // We purposefully do nothing with nop
         benchmark_end = clock();
         benchmark_total += benchmark_end - benchmark_begin;
