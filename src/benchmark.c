@@ -4,6 +4,8 @@
 #include <malloc.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
+#include <stdlib.h>
 
 #ifndef _WIN32
 #include <time.h>
@@ -47,6 +49,7 @@ static void run_benchmark(int (*bench_fn)(void *, size_t),
 void do_all_benchmarks()
 {
     const int str_search_sample_count = 100;
+    srand(time(NULL));
     run_benchmark(bench_strstr,
                   bench_gen_haystack_1,
                   str_search_sample_count,
@@ -76,7 +79,8 @@ static void run_benchmark(int (*bench_fn)(void *, size_t),
     }
     const bench_clock_ms_t result =
         (bench_clock_ms_t)((benchmark_total * 1000.0f) / CLOCKS_PER_SEC);
-    printf("Benchmark %s %d samples: %fms\n", name, sample_count, result);
+    const bench_clock_ms_t result_avg = result / sample_count;
+    printf("Benchmark %s %d samples: %fms\n", name, sample_count, result_avg);
     free(input);
 }
 
@@ -88,10 +92,11 @@ static size_t bench_gen_haystack_1(void **data, int iter)
         *data = cooler_malloc(test_str_len * sizeof(char));
     }
     char *haystack = *data;
-    memset(haystack, 'a', test_str_len * sizeof(char));
+    memset(haystack, (rand() % 27) + 30, test_str_len * sizeof(char));
     haystack[test_str_len - 1] = '\0';
     const char *needle         = "needle";
-    memcpy(&(haystack[1 * iter]), needle, strlen(needle));
+    const int n_len = strlen(needle);
+    memcpy(&(haystack[(rand() % test_str_len) - n_len - 1]), needle, n_len);
     return test_str_len;
 }
 
