@@ -11,24 +11,10 @@
 #include <time.h>
 #endif
 
-/*
- * bench_clock_t needs to be
- * a printable double precision float value
- * indicating milliseconds on
- * any platform.
- */
-#ifndef _WIN32
-typedef double bench_clock_ms_t;
-#else
-// TODO: idk how this is on windows
-typedef double bench_clock_ms_t;
-#endif
-
-void run_benchmark(benchmark_fn bench_fn,
-                   benchmark_input_gen input_gen,
-                   benchmark_input_cleanup input_clean,
-                   int sample_count,
-                   const char *name)
+bench_clock_ms_t run_benchmark(benchmark_fn bench_fn,
+                               benchmark_input_gen input_gen,
+                               benchmark_input_cleanup input_clean,
+                               int sample_count)
 {
     volatile clock_t benchmark_total = 0;
     volatile clock_t benchmark_begin = 0;
@@ -45,7 +31,13 @@ void run_benchmark(benchmark_fn bench_fn,
     }
     const bench_clock_ms_t result =
         (bench_clock_ms_t)((benchmark_total * 1000.0f) / CLOCKS_PER_SEC);
-    const bench_clock_ms_t result_avg = result / sample_count;
-    printf("Benchmark %s %d samples: %fms\n", name, sample_count, result_avg);
     input_clean(&input, in_len);
+    return result / sample_count;
+}
+
+void print_benchmark(bench_clock_ms_t result,
+                     int sample_count,
+                     const char *name)
+{
+    printf("Benchmark %s with %d samples: %f", name, sample_count, result);
 }
