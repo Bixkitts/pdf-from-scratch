@@ -4,6 +4,7 @@
 
 #include "file_handling.h"
 
+#include "benchmark.h"
 #include "converters.h"
 #include "dict_util_tests.h"
 #include "map_tests.h"
@@ -11,10 +12,12 @@
 #include "str_util_tests.h"
 
 const char *run_tests_arg = "test";
+const char *run_benchmarks_arg = "benchmarks";
 
 enum operation {
     OP_DEFAULT,
     OP_DO_TESTS,
+    OP_DO_BENCHMARKS,
     OP_MD_TO_PDF
 };
 
@@ -27,6 +30,9 @@ int main(int argc, char *argv[])
     switch (parse_arguments(argc, argv)) {
     case OP_DO_TESTS:
         do_tests();
+        break;
+    case OP_DO_BENCHMARKS:
+        do_all_benchmarks();
         break;
     case OP_MD_TO_PDF:
         if (md_to_pdf(argv[1], argv[2]) == -1) {
@@ -63,6 +69,9 @@ static enum operation parse_arguments(int argc, char *argv[])
 {
     if (argc == 2 && !strcmp((const char *)argv[1], run_tests_arg)) {
         return OP_DO_TESTS;
+    }
+    else if (argc == 2 && !strcmp((const char *)argv[1], run_benchmarks_arg)) {
+        return OP_DO_BENCHMARKS;
     }
     else if (argc == 3) {
         return OP_MD_TO_PDF;
