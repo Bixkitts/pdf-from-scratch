@@ -39,5 +39,5 @@ void print_benchmark(bench_clock_ms_t result,
                      int sample_count,
                      const char *name)
 {
-    printf("Benchmark %s with %d samples: %f\n", name, sample_count, result);
+    printf("Benchmark %s with %d samples: %fms\n", name, sample_count, result);
 }
