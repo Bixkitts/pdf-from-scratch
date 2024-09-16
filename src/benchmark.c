@@ -3,9 +3,9 @@
 #include "str_utils.h"
 #include <malloc.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdlib.h>
 
 #ifndef _WIN32
 #include <time.h>
@@ -92,11 +92,13 @@ static size_t bench_gen_haystack_1(void **data, int iter)
         *data = cooler_malloc(test_str_len * sizeof(char));
     }
     char *haystack = *data;
-    memset(haystack, (rand() % 27) + 30, test_str_len * sizeof(char));
+    memset(haystack,
+           (rand() % 90) + 33,
+           test_str_len * sizeof(char)); // ASCII alphanumberic garbage
     haystack[test_str_len - 1] = '\0';
     const char *needle         = "needle";
-    const int n_len = strlen(needle);
-    memcpy(&(haystack[(rand() % test_str_len) - n_len - 1]), needle, n_len);
+    const int n_len            = strlen(needle);
+    memcpy(&haystack[rand() % (test_str_len - n_len - 1)], needle, n_len);
     return test_str_len;
 }
 
