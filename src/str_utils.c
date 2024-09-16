@@ -45,7 +45,7 @@ static void str_search_compute_lps(const char *needle, int m, int *lps)
 /*
  * KMP algorithm
  */
-int str_search(const char *haystack, const char *needle)
+int cooler_strstr(const char *haystack, const char *needle)
 {
     int haystack_len = strlen(haystack);
     int needle_len   = strlen(needle);

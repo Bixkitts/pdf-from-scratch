@@ -8,7 +8,8 @@
 // TODO: optimise test and verify
 void str_rev(char *str);
 
-int str_search(const char *haystack, const char *needle);
+/* Alternate strstr, don't use until faster than strstr */
+int cooler_strstr(const char *haystack, const char *needle);
 
 #ifndef _WIN32
 // TODO: optimise test and verify
