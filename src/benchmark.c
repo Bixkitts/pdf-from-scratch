@@ -92,9 +92,9 @@ static size_t bench_gen_haystack_1(void **data, int iter)
         *data = cooler_malloc(test_str_len * sizeof(char));
     }
     char *haystack = *data;
-    memset(haystack,
-           (rand() % 90) + 33,
-           test_str_len * sizeof(char)); // ASCII alphanumberic garbage
+    for (size_t i = 0; i < test_str_len; i++) {
+        haystack[i] = (rand() % 90) + 33;
+    }
     haystack[test_str_len - 1] = '\0';
     const char *needle         = "needle";
     const int n_len            = strlen(needle);
