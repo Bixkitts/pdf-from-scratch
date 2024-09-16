@@ -11,7 +11,7 @@
 #include "pdf_tests.h"
 #include "str_util_tests.h"
 
-const char *run_tests_arg = "test";
+const char *run_tests_arg      = "test";
 const char *run_benchmarks_arg = "benchmarks";
 
 enum operation {
