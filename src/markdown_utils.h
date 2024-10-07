@@ -6,22 +6,12 @@
 
 #define MD_DELIMITER_LEN 16
 
+typedef size_t md_index_t;
+
 enum md_delimiter_type {
     MD_DELIM_TITLE,
     MD_DELIM_BULLET,
     MD_DELIM_COUNT
-};
-
-typedef size_t md_index_t;
-
-struct md_delimiter {
-    char open[MD_DELIMITER_LEN];
-    char close[MD_DELIMITER_LEN];
-};
-
-// TODO: something like this?
-struct md_delimiters {
-    struct md_delimiter data[MD_DELIM_COUNT];
 };
 
 // Where the delimiters are found
@@ -33,13 +23,12 @@ struct md_delimiter_results {
     md_index_t *indices;
     size_t *lengths;
     size_t count;
+    size_t capacity;
 };
 
 int parse_markdown(
-    const struct md_delimiter *delims,
-    int delim_count,
     const struct mapped_file *md,
-    struct md_delimiter_results *out_results);
+    struct md_delimiter_results out_results[static MD_DELIM_COUNT]);
 void delete_md_parse_results(
     struct md_delimiter_results *results,
     size_t count);
