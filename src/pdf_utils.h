@@ -38,17 +38,17 @@ struct subsection_heading {
 size_t get_obj_length(const char *obj_strarr[], size_t len, size_t lengths[]);
 char *get_with_delim(const char *str);
 size_t get_stream_length(const char *obj_strarr[], int len);
-const char *find_cross_reference_section(const char *file_content,
-                                         size_t content_len);
+const char *
+find_cross_reference_section(const char *file_content, size_t content_len);
 const char *find_trailer(const char *xref_tag_ptr, const char *eof);
-struct xref_section get_xref_section(const char *file_content,
-                                     size_t content_len);
+struct xref_section
+get_xref_section(const char *file_content, size_t content_len);
 static const char *get_section_end(const char *ptr, size_t obj_cnt);
-struct subsection_heading get_first_section(const char *xref_tag_ptr,
-                                            const char *eof);
+struct subsection_heading
+get_first_section(const char *xref_tag_ptr, const char *eof);
 int has_next_section(struct subsection_heading section, const char *trailer);
-struct subsection_heading get_next_section(struct subsection_heading section,
-                                           const char *eof);
+struct subsection_heading
+get_next_section(struct subsection_heading section, const char *eof);
 int has_free_objects(struct subsection_heading sec);
 
 /*
@@ -67,7 +67,8 @@ void write_page_dictionary(struct pdf *out_pdf);
  * --------------------------------------------
  */
 size_t obj_join(char **out, const char *obj_strarr[], size_t len);
-int replace_label_in_obj(char *obj_strarr[],
-                         int len,
-                         const char *label,
-                         const char *replace);
+int replace_label_in_obj(
+    char *obj_strarr[],
+    int len,
+    const char *label,
+    const char *replace);

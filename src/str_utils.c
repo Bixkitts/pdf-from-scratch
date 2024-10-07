@@ -121,10 +121,11 @@ char *itoa(int value, char *str, int base)
 }
 #endif
 
-int ends_with(const char *str,
-              const char *suffix,
-              size_t str_len,
-              size_t suffix_len)
+int ends_with(
+    const char *str,
+    const char *suffix,
+    size_t str_len,
+    size_t suffix_len)
 {
     if (!str || !suffix)
         return 0;
@@ -133,10 +134,11 @@ int ends_with(const char *str,
     return strncmp(str + str_len - suffix_len, suffix, suffix_len) == 0;
 }
 
-int starts_with(const char *str,
-                const char *prefix,
-                size_t str_len,
-                size_t prefix_len)
+int starts_with(
+    const char *str,
+    const char *prefix,
+    size_t str_len,
+    size_t prefix_len)
 {
     if (!str || !prefix)
         return 0;
@@ -145,9 +147,8 @@ int starts_with(const char *str,
     return strncmp(str, prefix, prefix_len) == 0;
 }
 
-size_t count_chars_before_string(const char *str,
-                                 const char *before,
-                                 size_t str_len)
+size_t
+count_chars_before_string(const char *str, const char *before, size_t str_len)
 {
     if (!before)
         return str_len;
@@ -157,10 +158,11 @@ size_t count_chars_before_string(const char *str,
     return pos - str;
 }
 
-size_t count_chars_after_string(const char *str,
-                                const char *after,
-                                size_t str_len,
-                                size_t after_len)
+size_t count_chars_after_string(
+    const char *str,
+    const char *after,
+    size_t str_len,
+    size_t after_len)
 {
     if (!after)
         return str_len;

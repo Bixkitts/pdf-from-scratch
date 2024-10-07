@@ -100,16 +100,20 @@ static void do_all_benchmarks()
 {
     const int str_search_sample_count = 100000;
     srand(time(NULL));
-    print_benchmark(run_benchmark(bench_strstr,
-                                  bench_gen_haystack_1,
-                                  bench_haystack_1_cleanup,
-                                  str_search_sample_count),
-                    str_search_sample_count,
-                    "strstr()");
-    print_benchmark(run_benchmark(bench_cooler_strstr,
-                                  bench_gen_haystack_1,
-                                  bench_haystack_1_cleanup,
-                                  str_search_sample_count),
-                    str_search_sample_count,
-                    "cooler_strstr()");
+    print_benchmark(
+        run_benchmark(
+            bench_strstr,
+            bench_gen_haystack_1,
+            bench_haystack_1_cleanup,
+            str_search_sample_count),
+        str_search_sample_count,
+        "strstr()");
+    print_benchmark(
+        run_benchmark(
+            bench_cooler_strstr,
+            bench_gen_haystack_1,
+            bench_haystack_1_cleanup,
+            str_search_sample_count),
+        str_search_sample_count,
+        "cooler_strstr()");
 }

@@ -60,8 +60,9 @@ static struct md_index_result find_next_delim_close(
 static int realloc_results(struct md_delimiter_results *out_res, size_t count)
 {
     assert(count > out_res->count);
-    void *new_alloc = cooler_malloc((count * sizeof(*out_res->indices)) +
-                                    (count * sizeof(*out_res->lengths)));
+    void *new_alloc = cooler_malloc(
+        (count * sizeof(*out_res->indices)) +
+        (count * sizeof(*out_res->lengths)));
 
     memcpy(new_alloc,
            out_res->indices,
@@ -81,10 +82,11 @@ static int realloc_results(struct md_delimiter_results *out_res, size_t count)
     return 0;
 }
 
-int parse_markdown(const struct md_delimiter *delims,
-                   int delim_count,
-                   const struct mapped_file *md,
-                   struct md_delimiter_results *out_results)
+int parse_markdown(
+    const struct md_delimiter *delims,
+    int delim_count,
+    const struct mapped_file *md,
+    struct md_delimiter_results *out_results)
 {
     const md_index_t base_result_alloc_size = 32;
     md_index_t result_alloc_size            = base_result_alloc_size;

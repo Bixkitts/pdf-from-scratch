@@ -30,36 +30,39 @@ const char *pdf_str_xref =
     "0000002452 00000 n\n"
     "… byte offset for object 6, exactly 10 digits … 00000 n\n"
     "0000003309 00000 n\n";
-const char *pdf_str_trailer = "trailer\n"
-                              "<</Size 8 /Root 1 0 R>>\n";
+const char *pdf_str_trailer =
+    "trailer\n"
+    "<</Size 8 /Root 1 0 R>>\n";
 const char *pdf_str_xref_start =
     "startxref\n"
     "… exact offset of the word xref from the start of the file …\n";
 const char *pdf_str_footer = "%%EOF\n";
-const char *pdf_str_font_1 = "5 0 obj\n" // %Font dictionary (Helvetica)
-                             "<<"
-                             "/Type /Font\n"
-                             "/Subtype /Type1\n"
-                             "/BaseFont /Helvetica\n"
-                             "/Encoding /WinAnsiEncoding\n"
-                             "/FirstChar \n"
-                             "/LastChar \n"
-                             "/Widths []\n"
-                             "/FontDescriptor \n"
-                             ">>\n"
-                             "endobj\n";
-const char *pdf_str_font_2 = "6 0 obj\n" // %Font dictionary (Helvetica-Oblique)
-                             "<<"
-                             "/Type /Font\n"
-                             "/Subtype /Type1\n"
-                             "/BaseFont /Helvetica-Oblique\n"
-                             "/Encoding /WinAnsiEncoding\n"
-                             "/FirstChar \n"
-                             "/LastChar \n"
-                             "/Widths []\n"
-                             "/FontDescriptor \n"
-                             ">>\n"
-                             "endobj\n";
+const char *pdf_str_font_1 =
+    "5 0 obj\n" // %Font dictionary (Helvetica)
+    "<<"
+    "/Type /Font\n"
+    "/Subtype /Type1\n"
+    "/BaseFont /Helvetica\n"
+    "/Encoding /WinAnsiEncoding\n"
+    "/FirstChar \n"
+    "/LastChar \n"
+    "/Widths []\n"
+    "/FontDescriptor \n"
+    ">>\n"
+    "endobj\n";
+const char *pdf_str_font_2 =
+    "6 0 obj\n" // %Font dictionary (Helvetica-Oblique)
+    "<<"
+    "/Type /Font\n"
+    "/Subtype /Type1\n"
+    "/BaseFont /Helvetica-Oblique\n"
+    "/Encoding /WinAnsiEncoding\n"
+    "/FirstChar \n"
+    "/LastChar \n"
+    "/Widths []\n"
+    "/FontDescriptor \n"
+    ">>\n"
+    "endobj\n";
 const char *pdf_str_catalog =
     "1 0 obj\n" // Catalog (root) object to locate everything else
     "<<"
@@ -76,22 +79,23 @@ const char *pdf_str_catalog_pages =
     "/Count 1\n"
     ">>\n"
     "endobj\n";
-const char *pdf_str_pages[]        = {"3 0 obj\n", // %Page dictionary
-                                      "<<",
-                                      "/Type /Page\n"
-                                             "/Parent 2 0 R\n"
-                                             "/MediaBox [0 0 612 792]\n"
-                                             "/Contents 4 0 R\n"
-                                             "/Resources "
-                                             "<<"
-                                             "/Font "
-                                             "<<"
-                                             "/F1 5 0 R\n" // %Internal ref, not font name
-                                      "/F2 6 0 R\n" // %Internal ref, not font name
-                                      ">>\n"
-                                             ">>\n",
-                                      ">>\n",
-                                      "endobj\n"};
+const char *pdf_str_pages[] = {
+    "3 0 obj\n", // %Page dictionary
+    "<<",
+    "/Type /Page\n"
+    "/Parent 2 0 R\n"
+    "/MediaBox [0 0 612 792]\n"
+    "/Contents 4 0 R\n"
+    "/Resources "
+    "<<"
+    "/Font "
+    "<<"
+    "/F1 5 0 R\n" // %Internal ref, not font name
+    "/F2 6 0 R\n" // %Internal ref, not font name
+    ">>\n"
+    ">>\n",
+    ">>\n",
+    "endobj\n"};
 const char *pdf_str_page_content[] = {
     "4 0 obj\n" // %Page contents for page 1
     "<<"
@@ -157,10 +161,11 @@ char *get_with_delim(const char *str)
     return c_label;
 }
 
-int replace_label_in_obj(char *obj_strarr[],
-                         int len,
-                         const char *label,
-                         const char *replace)
+int replace_label_in_obj(
+    char *obj_strarr[],
+    int len,
+    const char *label,
+    const char *replace)
 {
     char *c_label = get_with_delim(label);
     if (c_label == 0)
@@ -225,8 +230,8 @@ size_t obj_join(char **out, const char *obj_strarr[], size_t len)
     return obj_len;
 }
 
-const char *find_cross_reference_section(const char *file_content,
-                                         size_t content_len)
+const char *
+find_cross_reference_section(const char *file_content, size_t content_len)
 {
     const char *res = strstr(file_content, "\nxref\n") + 1;
     if (res > file_content + content_len)
@@ -242,8 +247,8 @@ const char *find_trailer(const char *xref_tag_ptr, const char *eof)
     return res;
 }
 
-struct xref_section get_xref_section(const char *file_content,
-                                     size_t content_len)
+struct xref_section
+get_xref_section(const char *file_content, size_t content_len)
 {
     struct xref_section res;
     res.xref_tag    = find_cross_reference_section(file_content, content_len);
@@ -260,8 +265,8 @@ static const char *get_section_end(const char *ptr, size_t obj_cnt)
     return ptr;
 }
 
-struct subsection_heading get_first_section(const char *xref_tag_ptr,
-                                            const char *eof)
+struct subsection_heading
+get_first_section(const char *xref_tag_ptr, const char *eof)
 {
     struct subsection_heading res;
     res.begin      = xref_tag_ptr + 5;
@@ -285,8 +290,8 @@ int has_next_section(struct subsection_heading section, const char *trailer)
     return (se + 1) == trailer;
 }
 
-struct subsection_heading get_next_section(struct subsection_heading section,
-                                           const char *eof)
+struct subsection_heading
+get_next_section(struct subsection_heading section, const char *eof)
 {
     struct subsection_heading res;
     res.begin      = section.end + 1;

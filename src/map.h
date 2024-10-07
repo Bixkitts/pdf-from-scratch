@@ -46,16 +46,19 @@ struct __attribute__((packed)) map {
 
 void new_map(struct map *out_map);
 void destroy_map(struct map *out_map);
-int map_cpy_insert(struct map *out_map,
-                   const struct map_key *in_key,
-                   const char *restrict data,
-                   size_t data_size);
-int map_mov_insert(struct map *out_map,
-                   const struct map_key *in_key,
-                   char *data,
-                   size_t data_size);
+int map_cpy_insert(
+    struct map *out_map,
+    const struct map_key *in_key,
+    const char *restrict data,
+    size_t data_size);
+int map_mov_insert(
+    struct map *out_map,
+    const struct map_key *in_key,
+    char *data,
+    size_t data_size);
 void map_erase(struct map *out_map, const struct map_key *in_key);
 void map_erase_index(struct map *out_map, map_index_t index);
-map_index_t map_get(const struct map *in_map,
-                    const struct map_key *in_key,
-                    struct map_data_entry **out_data);
+map_index_t map_get(
+    const struct map *in_map,
+    const struct map_key *in_key,
+    struct map_data_entry **out_data);

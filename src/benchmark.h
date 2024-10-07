@@ -34,8 +34,12 @@ typedef double bench_clock_ms_t;
 // TODO: idk how this is on windows
 typedef double bench_clock_ms_t;
 #endif
-void print_benchmark(bench_clock_ms_t result, int sample_count, const char *name);
-bench_clock_ms_t run_benchmark(benchmark_fn bench_fn,
-                               benchmark_input_gen input_gen,
-                               benchmark_input_cleanup input_clean,
-                               int sample_count);
+void print_benchmark(
+    bench_clock_ms_t result,
+    int sample_count,
+    const char *name);
+bench_clock_ms_t run_benchmark(
+    benchmark_fn bench_fn,
+    benchmark_input_gen input_gen,
+    benchmark_input_cleanup input_clean,
+    int sample_count);

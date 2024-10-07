@@ -16,24 +16,26 @@ int cooler_strstr(const char *haystack, const char *needle);
 char *itoa(int value, char *str, int base);
 #endif
 
-int ends_with(const char *str,
-              const char *suffix,
-              size_t str_len,
-              size_t suffix_len);
+int ends_with(
+    const char *str,
+    const char *suffix,
+    size_t str_len,
+    size_t suffix_len);
 
-int starts_with(const char *str,
-                const char *prefix,
-                size_t str_len,
-                size_t prefix_len);
+int starts_with(
+    const char *str,
+    const char *prefix,
+    size_t str_len,
+    size_t prefix_len);
 
-size_t count_chars_before_string(const char *str,
-                                 const char *before,
-                                 size_t str_len);
+size_t
+count_chars_before_string(const char *str, const char *before, size_t str_len);
 
-size_t count_chars_after_string(const char *str,
-                                const char *after,
-                                size_t str_len,
-                                size_t after_len);
+size_t count_chars_after_string(
+    const char *str,
+    const char *after,
+    size_t str_len,
+    size_t after_len);
 
 const char *find_nonspace(const char *begin, const char *end);
 
@@ -66,8 +68,9 @@ char *strpbrk(const char *str, const char *ctrl);
 
 int count_for_split_str_by_whitespace(char *str, size_t str_len);
 
-int split_string_by_whitespace(char *str,
-                               char **out,
-                               size_t str_len,
-                               int count);
+int split_string_by_whitespace(
+    char *str,
+    char **out,
+    size_t str_len,
+    int count);
 char *str_replace(const char *orig, const char *rep, const char *with);

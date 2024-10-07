@@ -31,12 +31,15 @@ struct md_delimiter_results {
     // indices and lengths point into
     // the allocation
     md_index_t *indices;
-    size_t *lengths;    
+    size_t *lengths;
     size_t count;
 };
 
-int parse_markdown(const struct md_delimiter *delims,
-                   int delim_count,
-                   const struct mapped_file *md,
-                   struct md_delimiter_results *out_results);
-void delete_md_parse_results(struct md_delimiter_results *results, size_t count);
+int parse_markdown(
+    const struct md_delimiter *delims,
+    int delim_count,
+    const struct mapped_file *md,
+    struct md_delimiter_results *out_results);
+void delete_md_parse_results(
+    struct md_delimiter_results *results,
+    size_t count);

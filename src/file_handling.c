@@ -21,13 +21,14 @@ static int fail_with(const char *message, int fd);
 #ifdef _WIN32
 int memory_map_file(const char *dir, struct mapped_file *out_mf)
 {
-    HANDLE hFile = CreateFileA(dir,
-                               GENERIC_READ,
-                               0,
-                               NULL,
-                               OPEN_EXISTING,
-                               FILE_ATTRIBUTE_NORMAL,
-                               NULL);
+    HANDLE hFile = CreateFileA(
+        dir,
+        GENERIC_READ,
+        0,
+        NULL,
+        OPEN_EXISTING,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL);
     if (hFile == INVALID_HANDLE_VALUE) {
         perror("Error opening file");
         return -1;

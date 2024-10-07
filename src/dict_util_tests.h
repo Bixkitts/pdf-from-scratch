@@ -8,12 +8,13 @@
 
 int test_str_dict_to_arr(void)
 {
-    const char *ex_dict2 = "<<"
-                           "/Item1 0.4"
-                           "/Item2 true"
-                           "/LastItem (not !)"
-                           "/VeryLastItem (OK)"
-                           ">>";
+    const char *ex_dict2 =
+        "<<"
+        "/Item1 0.4"
+        "/Item2 true"
+        "/LastItem (not !)"
+        "/VeryLastItem (OK)"
+        ">>";
 
     char **out = NULL;
     int items  = str_dict_to_arr(strdup(ex_dict2), out);
@@ -26,21 +27,22 @@ int test_str_dict_to_arr(void)
 
 int test_find_nested_in_dict_str(void)
 {
-    const char *out_dict = "<</Type / Example\n"
-                           "/Subtype /DictionaryExample\n"
-                           "/Version <<>>\n"
-                           "/IntegerItem 12\n"
-                           "/StringItem (a string)\n"
-                           "/Subdictionary "
-                           "{{{tagXX}}} r\n"
-                           ">>\n"
-                           "{{{tagXX}}} obj\n"
-                           "<<\n"
-                           "/Item1 0.4\n"
-                           "/Item2 true\n"
-                           "/LastItem (not !)\n"
-                           "/VeryLastItem (OK)"
-                           ">>>>>>>>>>>>>>>>>>>";
+    const char *out_dict =
+        "<</Type / Example\n"
+        "/Subtype /DictionaryExample\n"
+        "/Version <<>>\n"
+        "/IntegerItem 12\n"
+        "/StringItem (a string)\n"
+        "/Subdictionary "
+        "{{{tagXX}}} r\n"
+        ">>\n"
+        "{{{tagXX}}} obj\n"
+        "<<\n"
+        "/Item1 0.4\n"
+        "/Item2 true\n"
+        "/LastItem (not !)\n"
+        "/VeryLastItem (OK)"
+        ">>>>>>>>>>>>>>>>>>>";
     find_nested_in_dict_str(out_dict, strlen(out_dict));
     return 1;
 }

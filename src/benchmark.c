@@ -11,10 +11,11 @@
 #include <time.h>
 #endif
 
-bench_clock_ms_t run_benchmark(benchmark_fn bench_fn,
-                               benchmark_input_gen input_gen,
-                               benchmark_input_cleanup input_clean,
-                               int sample_count)
+bench_clock_ms_t run_benchmark(
+    benchmark_fn bench_fn,
+    benchmark_input_gen input_gen,
+    benchmark_input_cleanup input_clean,
+    int sample_count)
 {
     volatile clock_t benchmark_total = 0;
     volatile clock_t benchmark_begin = 0;
@@ -22,10 +23,10 @@ bench_clock_ms_t run_benchmark(benchmark_fn bench_fn,
     void *input                      = NULL;
     size_t in_len                    = 0;
     for (int i = 0; i < sample_count; i++) {
-        in_len          = input_gen(&input, i);
-        benchmark_begin = clock();
-        volatile long long nop =
-            bench_fn(input, in_len); // We purposefully do nothing with nop
+        in_len                 = input_gen(&input, i);
+        benchmark_begin        = clock();
+        volatile long long nop = bench_fn(input, in_len); // We purposefully do
+                                                          // nothing with nop
         benchmark_end = clock();
         benchmark_total += benchmark_end - benchmark_begin;
     }
@@ -35,9 +36,10 @@ bench_clock_ms_t run_benchmark(benchmark_fn bench_fn,
     return result / sample_count;
 }
 
-void print_benchmark(bench_clock_ms_t result,
-                     int sample_count,
-                     const char *name)
+void print_benchmark(
+    bench_clock_ms_t result,
+    int sample_count,
+    const char *name)
 {
     printf("Benchmark %s with %d samples: %fms\n", name, sample_count, result);
 }

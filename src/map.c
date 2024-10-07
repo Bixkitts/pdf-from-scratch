@@ -39,9 +39,8 @@ static map_index_t map_get_empty_index(const struct map *map)
  * TODO: This could be a helper function   *
  *       independant of the map            */
 #ifdef __AVX2__
-static int find_32byte_chunk(const char *array,
-                             size_t array_len,
-                             const char *chunk)
+static int
+find_32byte_chunk(const char *array, size_t array_len, const char *chunk)
 {
     // TODO: not tested
     size_t array_size    = array_len * 32;
@@ -65,8 +64,8 @@ static int find_32byte_chunk(const char *array,
 
 /* Returns the index in the map,     *
  * or -1 on failure to find the key. */
-static map_index_t map_find_key(const struct map *map,
-                                const struct map_key *restrict in_key)
+static map_index_t
+map_find_key(const struct map *map, const struct map_key *restrict in_key)
 {
 // TODO: #ifdef in a function is not pretty
 #ifdef __AVX2__
@@ -98,8 +97,8 @@ static map_index_t map_find_key(const struct map *map,
     return -1;
 }
 
-static map_index_t map_get_index_from_key(const struct map *in_map,
-                                          const struct map_key *in_key)
+static map_index_t
+map_get_index_from_key(const struct map *in_map, const struct map_key *in_key)
 {
     map_index_t slot = map_find_key(in_map, in_key);
     if (slot < 0) {
@@ -207,9 +206,10 @@ void destroy_map(struct map *out_map)
  * an occupied key in the map,          *
  * it needs to be explicitly erased     *
  * first                                */
-static void map_try_store_key(struct map *out_map,
-                              map_index_t index,
-                              const struct map_key *in_key)
+static void map_try_store_key(
+    struct map *out_map,
+    map_index_t index,
+    const struct map_key *in_key)
 {
     if (out_map->keys[index].string) {
         return;
@@ -229,10 +229,11 @@ static void map_try_store_key(struct map *out_map,
     memcpy(out_map->keys[index].string, in_key->string, in_key->len);
 }
 
-int map_cpy_insert(struct map *out_map,
-                   const struct map_key *in_key,
-                   const char *restrict data,
-                   size_t data_size)
+int map_cpy_insert(
+    struct map *out_map,
+    const struct map_key *in_key,
+    const char *restrict data,
+    size_t data_size)
 {
     map_index_t index = map_get_index_from_key(out_map, in_key);
     if (index < 0) {
@@ -254,10 +255,11 @@ int map_cpy_insert(struct map *out_map,
     return 0;
 }
 
-int map_mov_insert(struct map *out_map,
-                   const struct map_key *in_key,
-                   char *data,
-                   size_t data_size)
+int map_mov_insert(
+    struct map *out_map,
+    const struct map_key *in_key,
+    char *data,
+    size_t data_size)
 {
     map_index_t index = map_get_index_from_key(out_map, in_key);
     if (index < 0) {
@@ -302,9 +304,10 @@ void map_erase(struct map *out_map, const struct map_key *in_key)
     map_erase_index(out_map, index);
 }
 
-map_index_t map_get(const struct map *out_map,
-                    const struct map_key *in_key,
-                    struct map_data_entry **out_data)
+map_index_t map_get(
+    const struct map *out_map,
+    const struct map_key *in_key,
+    struct map_data_entry **out_data)
 {
     map_index_t index = map_find_key(out_map, in_key);
     if (index >= 0) {
