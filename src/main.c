@@ -12,6 +12,7 @@
 #include "map_tests.h"
 #include "pdf_tests.h"
 #include "str_util_tests.h"
+#include "test_util.h"
 
 const char *run_tests_arg      = "test";
 const char *run_benchmarks_arg = "benchmarks";
@@ -84,14 +85,17 @@ static enum operation parse_arguments(int argc, char *argv[])
 
 static void do_tests(void)
 {
-    do_pdf_utils_tests();
-    do_str_utils_tests();
-    do_dict_util_tests();
-    do_map_tests();
+    struct test_results results = {};
+    do_pdf_utils_tests(&results);
+    do_str_utils_tests(&results);
+    do_dict_util_tests(&results);
+    do_map_tests(&results);
+
+    print_test_results(&results);
+
+    printf("Press ENTER key to Continue\n");
 
     char ch;
-    printf("passed %d of %d.\n", p, t);
-    printf("Press ENTER key to Continue\n");
     volatile int i = scanf("%c", &ch);
     i++;
 }

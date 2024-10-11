@@ -77,7 +77,7 @@ int find_nested_in_dict_str(const char *str_dict, size_t str_len)
             o_ptr = s_ptr;
         s_ptr--;
     };
-    printf("%p %p \n", (void *)s_ptr, (void *)o_ptr);
+    // printf("%p %p \n", (void *)s_ptr, (void *)o_ptr);
     if (s_ptr == str_dict && !is_left_dd(s_ptr))
         return 0;
     if (o_ptr == NULL)
@@ -86,7 +86,7 @@ int find_nested_in_dict_str(const char *str_dict, size_t str_len)
     size_t out_len = o_ptr - s_ptr;
     char *out      = stralloc(out_len + 1);
     memcpy(out, s_ptr, out_len);
-    printf("%s \n", out);
+    // printf("%s \n", out);
     return 1;
 }
 

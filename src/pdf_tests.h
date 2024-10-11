@@ -4,7 +4,7 @@
 #include "pdf_utils.h"
 #include "test_util.h"
 
-int obj_length_test(void)
+test_result_t obj_length_test(void *)
 {
     const char *ex_obj[] = {
         "4 0 obj\n"
@@ -18,7 +18,7 @@ int obj_length_test(void)
     return get_obj_length2(ex_obj, STARRLEN(ex_obj)) == 50;
 }
 
-int obj_replace_test(void)
+test_result_t obj_replace_test(void *)
 {
     char *ex_obj[] = {
         "4 0 obj\n"
@@ -32,7 +32,7 @@ int obj_replace_test(void)
     return replace_label_in_obj(ex_obj, STARRLEN(ex_obj), "leee n", "test") > 1;
 }
 
-int obj_stream_len_is_9(void)
+test_result_t obj_stream_len_is_9(void *)
 {
     const char *ex_obj[] = {
         "4 0 obj\n"
@@ -46,7 +46,7 @@ int obj_stream_len_is_9(void)
     return slen == 9;
 }
 
-int obj_stream_pastes_correctly(void)
+test_result_t obj_stream_pastes_correctly(void *)
 {
     char *ex_obj[] = {
         "4 0 obj\n"
@@ -65,7 +65,7 @@ int obj_stream_pastes_correctly(void)
                   "/Length 9") == 0;
 }
 
-int obj_lens_calculated_properly(void)
+test_result_t obj_lens_calculated_properly(void *)
 {
     const char *ex_arr[] = {"a", "b", "c"};
     size_t ex_arr_len    = STARRLEN(ex_arr);
@@ -75,7 +75,7 @@ int obj_lens_calculated_properly(void)
     return lens[0] == 1 && lens[1] == 1 && lens[2] == 1;
 }
 
-int obj_lens_real_example_calculated_properly(void)
+test_result_t obj_lens_real_example_calculated_properly(void *)
 {
     const char *ex_obj[] = {
         "4 0 obj\n"
@@ -92,7 +92,7 @@ int obj_lens_real_example_calculated_properly(void)
     return lens[3] == 11;
 }
 
-int obj_join_works(void)
+test_result_t obj_join_works(void *)
 {
     char *ex_obj[] = {
         "4 0 obj\n"
@@ -115,13 +115,29 @@ int obj_join_works(void)
                "\nendstream\n") == 0;
 }
 
-void do_pdf_utils_tests(void)
+void do_pdf_utils_tests(struct test_results *out_results)
 {
-    RUNTEST(obj_replace_test);
-    RUNTEST(obj_stream_len_is_9);
-    RUNTEST(obj_stream_pastes_correctly);
-    RUNTEST(obj_length_test);
-    RUNTEST(obj_lens_calculated_properly);
-    RUNTEST(obj_lens_real_example_calculated_properly);
-    RUNTEST(obj_join_works);
+    run_test(obj_replace_test, NO_TEST_PARAMS, "obj_replace_test", out_results);
+    run_test(
+        obj_stream_len_is_9,
+        NO_TEST_PARAMS,
+        "obj_stream_len_is_9",
+        out_results);
+    run_test(
+        obj_stream_pastes_correctly,
+        NO_TEST_PARAMS,
+        "obj_stream_pastes_correctly",
+        out_results);
+    run_test(obj_length_test, NO_TEST_PARAMS, "obj_length_test", out_results);
+    run_test(
+        obj_lens_calculated_properly,
+        NO_TEST_PARAMS,
+        "obj_lens_calculated_properly",
+        out_results);
+    run_test(
+        obj_lens_real_example_calculated_properly,
+        NO_TEST_PARAMS,
+        "obj_lens_real_example_calculated_properly",
+        out_results);
+    run_test(obj_join_works, NO_TEST_PARAMS, "obj_join_works", out_results);
 }

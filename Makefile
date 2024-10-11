@@ -1,9 +1,9 @@
 CC          = gcc
-CFLAGS      = -mavx2 -Wall -Wextra -pedantic -std=c2x
+CFLAGS      = -mavx2 -Wall -Wextra -Wpedantic -Wno-unused-parameter -std=c2x
 SRCS        = src/*.c
 BUILD_DIR   = build
 TARGET      = $(BUILD_DIR)/md_parser
-DEBUG_FLAGS = -g -O0
+DEBUG_FLAGS = -g -O0 -DENABLE_TEST_RUNS -DSOFT_FAIL
 PROD_FLAGS  = -O2
 
 # Targets

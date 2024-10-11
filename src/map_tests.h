@@ -9,7 +9,7 @@
 #define MAP_TEST_BIG_LEN   64
 #define MAP_TEST_SMALL_LEN 16
 
-int test_map_big_insert(void)
+test_result_t test_map_big_insert(void *)
 {
     struct map test_map = {};
     const int rubbish   = 111;
@@ -33,7 +33,7 @@ int test_map_big_insert(void)
 #endif
 }
 
-int test_map_small_insert(void)
+test_result_t test_map_small_insert(void *)
 {
     struct map test_map = {};
     const int rubbish   = 111;
@@ -58,8 +58,16 @@ int test_map_small_insert(void)
 #endif
 }
 
-void do_map_tests(void)
+void do_map_tests(struct test_results *out_results)
 {
-    RUNTEST(test_map_big_insert);
-    RUNTEST(test_map_small_insert);
+    run_test(
+        test_map_big_insert,
+        NO_TEST_PARAMS,
+        "test_map_big_insert",
+        out_results);
+    run_test(
+        test_map_small_insert,
+        NO_TEST_PARAMS,
+        "test_map_small_insert",
+        out_results);
 }

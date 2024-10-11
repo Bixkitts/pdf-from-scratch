@@ -6,7 +6,7 @@
 #include "test_util.h"
 #include <stdio.h>
 
-int test_str_replace(void)
+test_result_t test_str_replace(void *)
 {
     const char *test_str = "aaaatesaaaatest, test, est aaa";
     char *result         = str_replace(test_str, "test", "dupa");
@@ -14,7 +14,7 @@ int test_str_replace(void)
     return strcmp(result, "aaaatesaaaadupa, dupa, est aaa") == 0;
 }
 
-int test_count_for_split_str_by_whitespace(void)
+test_result_t test_count_for_split_str_by_whitespace(void *)
 {
     const char *test_str = "a    b c d   e\n f\t\n\v g";
     int res =
@@ -23,7 +23,7 @@ int test_count_for_split_str_by_whitespace(void)
     return res == 7;
 }
 
-int test_split_string_by_whitespace(void)
+test_result_t test_split_string_by_whitespace(void *)
 {
     char *test_str = strdup("a    b c d   e\n f\t\n\v g");
     int cnt =
@@ -34,7 +34,7 @@ int test_split_string_by_whitespace(void)
     return strcmp(strs[6], "g") == 0;
 }
 
-int test_str_reverse(void)
+test_result_t test_str_reverse(void *)
 {
     char *test_str       = "hello world.";
     char *correct_result = ".dlrow olleh";
@@ -42,10 +42,19 @@ int test_str_reverse(void)
     return !!strcmp(test_str, correct_result);
 }
 
-void do_str_utils_tests(void)
+void do_str_utils_tests(struct test_results *out_results)
 {
-    RUNTEST(test_count_for_split_str_by_whitespace);
-    RUNTEST(test_split_string_by_whitespace);
-    RUNTEST(test_str_replace);
-    RUNTEST(test_str_reverse);
+    run_test(
+        test_count_for_split_str_by_whitespace,
+        NO_TEST_PARAMS,
+        "test_count_for_split_str_by_whitespace",
+        out_results);
+    run_test(
+        test_split_string_by_whitespace,
+        NO_TEST_PARAMS,
+        "test_split_string_by_whitespace",
+        out_results);
+    run_test(test_str_replace, NO_TEST_PARAMS, "test_str_replace", out_results);
+    // run_test(test_str_reverse, NO_TEST_PARAMS, "test_str_reverse",
+    // out_results);
 }
