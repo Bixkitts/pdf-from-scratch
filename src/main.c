@@ -59,7 +59,7 @@ static int md_to_pdf(const char *file_in, const char *file_out)
         return -1;
     }
     char *pdf      = NULL;
-    size_t pdf_len = convert_md_to_pdf(test_md.data, test_md.size, &pdf);
+    size_t pdf_len = convert_md_to_pdf(&test_md, &pdf);
     if (pdf_len == CONVERSION_FAILED) {
         fprintf(stderr, "MD to PDF conversion failed\n");
         return -1;
