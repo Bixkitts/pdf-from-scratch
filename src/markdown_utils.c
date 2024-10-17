@@ -8,7 +8,7 @@
 #include "markdown_utils.h"
 #include "mem_utils.h"
 
-#define INDEX_RESULT_ALLOC_GROW_FACTOR 2
+#define MD_RESULT_ALLOC_GROW_FACTOR 2
 
 struct md_delimiter {
     char open[MD_DELIMITER_LEN];
@@ -27,29 +27,22 @@ struct md_index_result {
     bool is_invalid;
 };
 
-static struct md_index_result find_next_delim_open(
-    const struct md_delimiter *delim,
+static struct md_index_result find_next_delim(
+    const char *delim,
     const struct mapped_file *md,
     size_t current_index);
-static struct md_index_result find_next_delim_close(
-    const struct md_delimiter *delim,
-    const struct mapped_file *md,
-    size_t current_index);
-static int realloc_results(struct md_delimiter_results *out_res, size_t count);
+static int md_results_increase_capacity(struct md_delimiter_results *out_res);
 
-static struct md_index_result find_next_delim_open(
-    const struct md_delimiter *delim,
+static struct md_index_result find_next_delim(
+    const char *delim,
     const struct mapped_file *md,
     size_t current_index)
 {
     struct md_index_result res = {0};
     char *current_loc          = (char *)md->data + current_index;
     while (current_index < md->size) {
-        void *loc = memmem(
-            current_loc,
-            md->size - current_index,
-            delim->open,
-            strlen(delim->open));
+        void *loc =
+            memmem(current_loc, md->size - current_index, delim, strlen(delim));
 
         if (loc) {
             res.index = (char *)loc - (char *)md->data;
@@ -63,35 +56,15 @@ static struct md_index_result find_next_delim_open(
     return res;
 }
 
-static struct md_index_result find_next_delim_close(
-    const struct md_delimiter *delim,
-    const struct mapped_file *md,
-    size_t current_index)
+static int md_results_increase_capacity(struct md_delimiter_results *out_res)
 {
-    struct md_index_result res = {0};
-    char *current_loc          = (char *)md->data + current_index;
-    while (current_index < md->size) {
-        void *loc = memmem(
-            current_loc,
-            md->size - current_index,
-            delim->close,
-            strlen(delim->close));
-
-        if (loc) {
-            res.index = (char *)loc - (char *)md->data;
-            break;
-        }
-        else {
-            res.is_invalid = 1;
-            break;
-        }
+    size_t new_capacity = 0;
+    if (out_res->capacity == 0) {
+        new_capacity = 32;
     }
-    return res;
-}
-
-static int realloc_results(struct md_delimiter_results *out_res, size_t new_capacity)
-{
-    assert(new_capacity > out_res->capacity);
+    else {
+        new_capacity = out_res->capacity * MD_RESULT_ALLOC_GROW_FACTOR;
+    }
     void *new_alloc = cooler_malloc(
         (new_capacity * sizeof(*out_res->indices)) +
         (new_capacity * sizeof(*out_res->lengths)));
@@ -118,17 +91,15 @@ int parse_markdown(
     const struct mapped_file *md,
     struct md_all_delimiter_results *out_results)
 {
-    const md_index_t base_result_alloc_size = 32;
-    md_index_t result_alloc_size            = base_result_alloc_size;
     for (int i = 0; i < MD_DELIM_COUNT; i++) {
-        realloc_results(&out_results->array[i], base_result_alloc_size);
+        md_results_increase_capacity(&out_results->array[i]);
         md_index_t cursor           = 0;
         unsigned int open_delim_len = strlen(default_md_delimiters[i].open);
         size_t result_count         = 0;
 
         while (cursor < md->size) {
             struct md_index_result open =
-                find_next_delim_open(&default_md_delimiters[i], md, cursor);
+                find_next_delim(default_md_delimiters[i].open, md, cursor);
             if (open.is_invalid) {
                 break;
             }
@@ -136,7 +107,7 @@ int parse_markdown(
             cursor = open.index;
 
             struct md_index_result close =
-                find_next_delim_close(&default_md_delimiters[i], md, cursor);
+                find_next_delim(default_md_delimiters[i].close, md, cursor);
             if (close.is_invalid) {
                 break;
             }
@@ -148,23 +119,19 @@ int parse_markdown(
             result_count++;
             out_results->array[i].count = result_count;
 
-            if (result_count >= result_alloc_size) {
-                result_alloc_size *= INDEX_RESULT_ALLOC_GROW_FACTOR;
-                realloc_results(&out_results->array[i], result_alloc_size);
+            if (result_count >= out_results->array[i].capacity) {
+                md_results_increase_capacity(&out_results->array[i]);
             }
         }
     }
     return 0;
 }
 
-void delete_md_parse_results(
-    struct md_all_delimiter_results *results,
-    size_t count)
+void delete_md_parse_results(struct md_all_delimiter_results *results)
 {
-    for (size_t i = 0; i < count; i++) {
-        assert(results->array[i].allocation != NULL);
-        free(results->array[i].allocation);
-    }
+    assert(results->array->allocation != NULL);
+    free(results->array->allocation);
+    results->array->allocation = NULL;
 }
 
 #undef _GNU_SOURCE

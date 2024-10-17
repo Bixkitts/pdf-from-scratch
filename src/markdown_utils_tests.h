@@ -19,8 +19,10 @@ test_result_t test_parse_markdown(void *)
         parse_results.array[MD_DELIM_TITLE].lengths[0] == 16 &&
         parse_results.array[MD_DELIM_TITLE].lengths[1] == 25 &&
         parse_results.array[MD_DELIM_BULLET].lengths[0] == 13) {
+        delete_md_parse_results(&parse_results);
         return TEST_SUCCEED;
     }
+    delete_md_parse_results(&parse_results);
     return TEST_FAIL;
 }
 
