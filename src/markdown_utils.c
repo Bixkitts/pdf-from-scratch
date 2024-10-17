@@ -24,7 +24,7 @@ default_md_delimiters[MD_DELIM_COUNT] =
 
 struct md_index_result {
     md_index_t index;
-    bool isInvalid;
+    bool is_invalid;
 };
 
 static struct md_index_result find_next_delim_open(
@@ -43,16 +43,20 @@ static struct md_index_result find_next_delim_open(
     size_t current_index)
 {
     struct md_index_result res = {0};
+    char *current_loc          = (char *)md->data + current_index;
     while (current_index < md->size) {
-        void *loc =
-            memmem(md->data, md->size, delim->open, strlen(delim->open));
+        void *loc = memmem(
+            current_loc,
+            md->size - current_index,
+            delim->open,
+            strlen(delim->open));
 
         if (loc) {
-            res.index = (char *)md->data - (char *)loc;
+            res.index = (char *)loc - (char *)md->data;
             break;
         }
         else {
-            res.isInvalid = 1;
+            res.is_invalid = 1;
             break;
         }
     }
@@ -65,16 +69,20 @@ static struct md_index_result find_next_delim_close(
     size_t current_index)
 {
     struct md_index_result res = {0};
+    char *current_loc          = (char *)md->data + current_index;
     while (current_index < md->size) {
-        void *loc =
-            memmem(md->data, md->size, delim->open, strlen(delim->open));
+        void *loc = memmem(
+            current_loc,
+            md->size - current_index,
+            delim->close,
+            strlen(delim->close));
 
         if (loc) {
-            res.index = (char *)md->data - (char *)loc;
+            res.index = (char *)loc - (char *)md->data;
             break;
         }
         else {
-            res.isInvalid = 1;
+            res.is_invalid = 1;
             break;
         }
     }
@@ -106,46 +114,56 @@ static int realloc_results(struct md_delimiter_results *out_res, size_t new_capa
     return 0;
 }
 
-int parse_markdown(const struct mapped_file *md,
-                   struct md_delimiter_results out_results[static MD_DELIM_COUNT])
+int parse_markdown(
+    const struct mapped_file *md,
+    struct md_all_delimiter_results *out_results)
 {
     const md_index_t base_result_alloc_size = 32;
     md_index_t result_alloc_size            = base_result_alloc_size;
     for (int i = 0; i < MD_DELIM_COUNT; i++) {
-        realloc_results(&out_results[i], base_result_alloc_size);
-        md_index_t cursor   = 0;
-        size_t result_count = 0;
+        realloc_results(&out_results->array[i], base_result_alloc_size);
+        md_index_t cursor           = 0;
+        unsigned int open_delim_len = strlen(default_md_delimiters[i].open);
+        size_t result_count         = 0;
+
         while (cursor < md->size) {
             struct md_index_result open =
                 find_next_delim_open(&default_md_delimiters[i], md, cursor);
-            if (open.isInvalid) {
+            if (open.is_invalid) {
                 break;
             }
+            open.index += open_delim_len;
             cursor = open.index;
+
             struct md_index_result close =
                 find_next_delim_close(&default_md_delimiters[i], md, cursor);
-            if (close.isInvalid) {
+            if (close.is_invalid) {
                 break;
             }
-            cursor                               = close.index;
-            out_results[i].indices[result_count] = open.index;
-            out_results[i].lengths[result_count] = close.index - open.index;
-            out_results[i].count                 = result_count;
+            cursor += close.index - open.index;
+
+            out_results->array[i].indices[result_count] = open.index;
+            out_results->array[i].lengths[result_count] =
+                close.index - open.index;
             result_count++;
-            if (result_count > result_alloc_size) {
+            out_results->array[i].count = result_count;
+
+            if (result_count >= result_alloc_size) {
                 result_alloc_size *= INDEX_RESULT_ALLOC_GROW_FACTOR;
-                realloc_results(&out_results[i], result_alloc_size);
+                realloc_results(&out_results->array[i], result_alloc_size);
             }
         }
     }
     return 0;
 }
 
-void delete_md_parse_results(struct md_delimiter_results *results, size_t count)
+void delete_md_parse_results(
+    struct md_all_delimiter_results *results,
+    size_t count)
 {
     for (size_t i = 0; i < count; i++) {
-        assert(results[i].allocation != NULL);
-        free(results[i].allocation);
+        assert(results->array[i].allocation != NULL);
+        free(results->array[i].allocation);
     }
 }
 

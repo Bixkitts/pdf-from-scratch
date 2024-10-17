@@ -26,9 +26,13 @@ struct md_delimiter_results {
     size_t capacity;
 };
 
+struct md_all_delimiter_results {
+    struct md_delimiter_results array[MD_DELIM_COUNT];
+};
+
 int parse_markdown(
     const struct mapped_file *md,
-    struct md_delimiter_results out_results[static MD_DELIM_COUNT]);
+    struct md_all_delimiter_results *out_results);
 void delete_md_parse_results(
-    struct md_delimiter_results *results,
+    struct md_all_delimiter_results *results,
     size_t count);

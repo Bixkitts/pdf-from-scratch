@@ -8,11 +8,13 @@
 #include "bench_funcs.h"
 #include "benchmark.h"
 #include "converters.h"
+#include "test_util.h"
+
 #include "dict_util_tests.h"
 #include "map_tests.h"
+#include "markdown_utils_tests.h"
 #include "pdf_tests.h"
 #include "str_util_tests.h"
-#include "test_util.h"
 
 const char *run_tests_arg      = "test";
 const char *run_benchmarks_arg = "benchmarks";
@@ -90,6 +92,7 @@ static void do_tests(void)
     do_str_utils_tests(&results);
     do_dict_util_tests(&results);
     do_map_tests(&results);
+    do_markdown_util_tests(&results);
 
     print_test_results(&results);
 
