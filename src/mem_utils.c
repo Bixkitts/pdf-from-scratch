@@ -11,7 +11,7 @@ void *cooler_realloc(void *source, size_t new_capacity)
 {
     void *res = realloc(source, new_capacity);
 #ifdef SOFT
-    if (NULL == res) {
+    if (!res) {
         free(source);
         perror("realloc failed");
         exit(EXIT_FAILURE);
@@ -24,8 +24,20 @@ void *cooler_malloc(size_t size)
 {
     void *res = malloc(size);
 #ifdef SOFT
-    if (NULL == res) {
+    if (!res) {
         perror("malloc failed");
+        exit(EXIT_FAILURE);
+    }
+#endif
+    return res;
+}
+
+void *cooler_calloc(size_t num, size_t size)
+{
+    void *res = calloc(num, size);
+#ifdef SOFT
+    if (!res) {
+        perror("calloc failed");
         exit(EXIT_FAILURE);
     }
 #endif

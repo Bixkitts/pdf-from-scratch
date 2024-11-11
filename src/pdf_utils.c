@@ -1,7 +1,10 @@
 #include "pdf_utils.h"
 
+#define PDF_MINIMUM_CAPACITY 2048
+#define PDF_GROWTH_RATE      2
+
 const char *obsraj         = "0000000000 65535 f";
-const char *pdf_str_header = "%PDF-2.0\nPOOP\n";
+const char *pdf_str_header = "%PDF-2.0\nTEST\n";
 const char *pdf_str_metadata =
     "7 0 obj\n" // %Document metadata
     "<<"
@@ -134,6 +137,22 @@ const char *pdf_str_page_content[] = {
     "endstream\n"
     "endobj\n"};
 
+static int extend_pdf_capacity(struct pdf *out_pdf);
+
+static int extend_pdf_capacity(struct pdf *out_pdf)
+{
+    if (!out_pdf->capacity) {
+        out_pdf->data     = cooler_calloc(PDF_MINIMUM_CAPACITY, sizeof(char));
+        out_pdf->capacity = PDF_MINIMUM_CAPACITY;
+    }
+    else {
+        out_pdf->data =
+            cooler_realloc(out_pdf->data, out_pdf->capacity * PDF_GROWTH_RATE);
+        out_pdf->capacity *= PDF_GROWTH_RATE;
+    }
+    return !out_pdf->data;
+}
+
 size_t get_obj_length(const char *obj_strarr[], size_t len, size_t lengths[])
 {
     size_t totalLength = 0;
@@ -184,18 +203,18 @@ int replace_label_in_obj(
 
 size_t get_stream_length(const char *obj_strarr[], int len)
 {
-    static const char *ENDSTREAM = "\nendstream\n";
-    static const char *STREAM    = "stream\n";
+    static const char *endstream = "\nendstream\n";
+    static const char *stream    = "stream\n";
     size_t total_length          = 0;
     int index_has_stream         = -1;
     int index_has_endstream      = -1;
     char *tmp                    = NULL;
     for (int i = 0; i < len; i++) {
         const char *bit = obj_strarr[i];
-        if ((tmp = strstr(bit, STREAM)) && index_has_stream == -1) {
+        if ((tmp = strstr(bit, stream)) && index_has_stream == -1) {
             index_has_stream = i;
         }
-        if ((tmp = strstr(bit, ENDSTREAM)) && index_has_endstream == -1) {
+        if ((tmp = strstr(bit, endstream)) && index_has_endstream == -1) {
             index_has_endstream = i;
         }
     }
@@ -208,11 +227,11 @@ size_t get_stream_length(const char *obj_strarr[], int len)
 
     const char *bit = obj_strarr[index_has_stream];
     total_length +=
-        count_chars_after_string(bit, STREAM, strlen(bit), sizeof(STREAM) - 1);
+        count_chars_after_string(bit, stream, strlen(bit), strlen(stream));
 
     for (int i = index_has_stream + 1; i < index_has_endstream; i++) {
         bit            = obj_strarr[i];
-        size_t count_b = count_chars_before_string(bit, ENDSTREAM, strlen(bit));
+        size_t count_b = count_chars_before_string(bit, endstream, strlen(bit));
         total_length += count_b;
     }
     return total_length;
@@ -315,26 +334,41 @@ int has_free_objects(struct subsection_heading sec)
     return strncmp(nl + 1, obsraj, 18) == 0;
 }
 
-void write_object_offsets(struct pdf *out_pdf)
+void make_valid(struct pdf *out_pdf)
+{
+    // 1. Find xref section
+    //    if one exists, and delete it.
+    //    Delete EOF stuff after it too.
+    //    (What if xref is NOT at EOF...)
+
+    // 2. Construct an xref
+    //    section by parsing the pdf
+
+    // 3. Insert it into the file,
+    //    presumably at the end,
+    //    after all the objects.
+
+    // 4. After it, write EOF stuff
+    //    like startxref
+
+}
+
+void add_obj_text_stream(struct pdf *out_pdf)
 {
 }
 
-void write_text_stream(struct pdf *out_pdf)
+void add_obj_font_dictionary(struct pdf *out_pdf)
 {
 }
 
-void write_font_dictionary(struct pdf *out_pdf)
+void add_obj_catalog(struct pdf *out_pdf)
 {
 }
 
-void write_catalog(struct pdf *out_pdf)
+void add_obj_pages_catalog(struct pdf *out_pdf)
 {
 }
 
-void write_pages_catalog(struct pdf *out_pdf)
-{
-}
-
-void write_page_dictionary(struct pdf *out_pdf)
+void add_obj_page_dictionary(struct pdf *out_pdf)
 {
 }

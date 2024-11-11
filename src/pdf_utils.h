@@ -13,10 +13,29 @@
     get_obj_length(obj_strarr, STARRLEN(obj_strarr), NULL)
 #define get_obj_length2(obj_strarr, len) get_obj_length(obj_strarr, len, NULL)
 
+enum pdf_object_type {
+    PDF_OBJ_STRING,
+    PDF_OBJ_DICT,
+    PDF_OBJ_NAME,
+    PDF_OBJ_STREAM,
+    PDF_OBJ_ARRAY,
+    PDF_OBJ_BOOL,
+    PDF_OBJ_NUM,
+    PDF_OBJ_COUNT
+};
+
+struct pdf_object {
+    size_t size;
+    enum pdf_object_type type;
+};
+
 struct pdf {
     char *data;
     size_t size;
     size_t capacity;
+    struct pdf_object *objects;
+    size_t object_count;
+    char *xref_section;
 };
 
 struct xref_section {
@@ -55,12 +74,18 @@ int has_free_objects(struct subsection_heading sec);
  * PDF Writing Functions
  * --------------------------------------------
  */
-void write_object_offsets(struct pdf *out_pdf);
-void write_text_stream(struct pdf *out_pdf);
-void write_font_dictionary(struct pdf *out_pdf);
-void write_catalog(struct pdf *out_pdf);
-void write_pages_catalog(struct pdf *out_pdf);
-void write_page_dictionary(struct pdf *out_pdf);
+void add_obj_text_stream(struct pdf *out_pdf);
+void add_obj_font_dictionary(struct pdf *out_pdf);
+void add_obj_catalog(struct pdf *out_pdf);
+void add_obj_pages_catalog(struct pdf *out_pdf);
+void add_obj_page_dictionary(struct pdf *out_pdf);
+
+// Call this after writing an
+// arbitrary amount of objects
+// in an arbitrary order
+// to generate xrefs and metadata
+// and ensure correctness etc.
+void make_valid(struct pdf *out_pdf);
 
 /*
  * Other PDF Utilities
