@@ -3,6 +3,14 @@
 #define PDF_MINIMUM_CAPACITY 2048
 #define PDF_GROWTH_RATE      2
 
+static void add_pdf_header(struct pdf *out_pdf);
+static void add_obj_font_dictionary(struct pdf *out_pdf);
+static void add_obj_catalog(struct pdf *out_pdf);
+static void add_obj_pages_catalog(struct pdf *out_pdf);
+static void add_obj_page_dictionary(struct pdf *out_pdf);
+static void make_valid(struct pdf *out_pdf);
+static int extend_pdf_capacity(struct pdf *out_pdf);
+
 const char *obsraj         = "0000000000 65535 f";
 const char *pdf_str_header = "%PDF-2.0\nTEST\n";
 const char *pdf_str_metadata =
@@ -137,20 +145,20 @@ const char *pdf_str_page_content[] = {
     "endstream\n"
     "endobj\n"};
 
-static int extend_pdf_capacity(struct pdf *out_pdf);
 
 static int extend_pdf_capacity(struct pdf *out_pdf)
 {
     if (!out_pdf->capacity) {
-        out_pdf->data     = cooler_calloc(PDF_MINIMUM_CAPACITY, sizeof(char));
+        out_pdf->raw_data     = cooler_calloc(PDF_MINIMUM_CAPACITY, sizeof(char));
         out_pdf->capacity = PDF_MINIMUM_CAPACITY;
     }
     else {
-        out_pdf->data =
-            cooler_realloc(out_pdf->data, out_pdf->capacity * PDF_GROWTH_RATE);
-        out_pdf->capacity *= PDF_GROWTH_RATE;
+        const size_t new_size = out_pdf->capacity * PDF_GROWTH_RATE;
+        out_pdf->raw_data =
+            cooler_realloc(out_pdf->raw_data, new_size);
+        out_pdf->capacity = new_size;
     }
-    return !out_pdf->data;
+    return !out_pdf->raw_data;
 }
 
 size_t get_obj_length(const char *obj_strarr[], size_t len, size_t lengths[])
@@ -371,4 +379,21 @@ void add_obj_pages_catalog(struct pdf *out_pdf)
 
 void add_obj_page_dictionary(struct pdf *out_pdf)
 {
+}
+
+void pdf_new(struct pdf *out_pdf)
+{
+    out_pdf->raw_data = cooler_calloc(PDF_MINIMUM_CAPACITY, sizeof(char));
+    out_pdf->capacity = PDF_MINIMUM_CAPACITY;
+    out_pdf->size = 0;
+}
+
+static void add_pdf_header(struct pdf *out_pdf)
+{
+    const size_t append_size = strlen(pdf_str_header);
+    if (out_pdf->size + append_size >= out_pdf->capacity) {
+        extend_pdf_capacity(out_pdf); 
+    }
+    strcat(out_pdf->raw_data, pdf_str_header);
+    out_pdf->size += append_size;
 }
