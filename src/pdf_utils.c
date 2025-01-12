@@ -1,8 +1,17 @@
 #include "pdf_utils.h"
+#include <stdbool.h>
 
 #define PDF_MINIMUM_CAPACITY 2048
 #define PDF_GROWTH_RATE      2
 
+struct pdf_obj {
+    char *data;
+    int elements;
+    size_t size;
+};
+
+static inline int can_fit(const struct pdf *pdf, size_t size);
+static void concat_pdf(struct pdf *out_pdf, const char *data, size_t size);
 static void add_pdf_header(struct pdf *out_pdf);
 static void add_obj_font_dictionary(struct pdf *out_pdf);
 static void add_obj_catalog(struct pdf *out_pdf);
@@ -13,20 +22,21 @@ static int extend_pdf_capacity(struct pdf *out_pdf);
 
 const char *obsraj         = "0000000000 65535 f";
 const char *pdf_str_header = "%PDF-2.0\nTEST\n";
-const char *pdf_str_metadata =
-    "7 0 obj\n" // %Document metadata
-    "<<"
-    "/Type /Metadata\n"
-    "/Subtype /XML\n"
-    "/Length … number of bytes in metadata …\n"
-    ">>\n"
-    "stream\n"
-    "<?xpacket begin=\"… UTF-8 value of U+FEFF (efbbbf) …\" "
-    "id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n"
-    "… document metadata …\n"
-    "<?xpacket end=\"w\"?>\n"
-    "endstream\n"
-    "endobj\n";
+const char *pdf_str_metadata[] = {
+    "7 0 obj\n", // %Document metadata
+    "<<",
+    "/Type /Metadata\n",
+    "/Subtype /XML\n",
+    "/Length … number of bytes in metadata …\n",
+    ">>\n",
+    "stream\n",
+    "<?xpacket begin=\"… UTF-8 value of U+FEFF (efbbbf) …\" ",
+    "id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n",
+    "… document metadata …\n",
+    "<?xpacket end=\"w\"?>\n",
+    "endstream\n",
+    "endobj\n",
+};
 const char *pdf_str_xref =
     "xref\n"
     "0 8\n"
@@ -342,7 +352,7 @@ int has_free_objects(struct subsection_heading sec)
     return strncmp(nl + 1, obsraj, 18) == 0;
 }
 
-void make_valid(struct pdf *out_pdf)
+static void make_valid(struct pdf *out_pdf)
 {
     // 1. Find xref section
     //    if one exists, and delete it.
@@ -361,24 +371,62 @@ void make_valid(struct pdf *out_pdf)
 
 }
 
-void add_obj_text_stream(struct pdf *out_pdf)
+static inline int can_fit(const struct pdf *pdf, size_t size)
+{
+    return pdf->size + size >= pdf->capacity;
+}
+
+static void concat_pdf(struct pdf *out_pdf, const char *data, size_t data_size)
+{
+    if (can_fit(out_pdf, data_size)) {
+        extend_pdf_capacity(out_pdf); 
+    }
+    strcat(out_pdf->raw_data, pdf_str_header);
+    out_pdf->size += data_size;
+}
+
+static void add_pdf_header(struct pdf *out_pdf)
+{
+    const size_t append_size = strlen(pdf_str_header);
+    concat_pdf(out_pdf, pdf_str_header, append_size);
+}
+
+static void add_obj_text_stream(struct pdf *out_pdf)
 {
 }
 
-void add_obj_font_dictionary(struct pdf *out_pdf)
+static void add_obj_font_dictionary(struct pdf *out_pdf)
 {
 }
 
-void add_obj_catalog(struct pdf *out_pdf)
+static void add_obj_catalog(struct pdf *out_pdf)
 {
+    const size_t append_size = strlen(pdf_str_catalog);
+    concat_pdf(out_pdf, pdf_str_catalog, append_size);
 }
 
-void add_obj_pages_catalog(struct pdf *out_pdf)
+static void add_obj_pages_catalog(struct pdf *out_pdf)
 {
+    const size_t append_size = strlen(pdf_str_catalog_pages);
+    concat_pdf(out_pdf, pdf_str_catalog_pages, append_size);
 }
 
-void add_obj_page_dictionary(struct pdf *out_pdf)
+static void add_obj_page_dictionary(struct pdf *out_pdf)
 {
+    const size_t append_size = strlen(pdf_str_page_);
+    concat_pdf(out_pdf, pdf_str_catalog_pages, append_size);
+}
+
+/*
+ * Create minimal objects needed to get
+ * some text rendering.
+ */
+static void add_scaffolding(struct pdf *out_pdf)
+{
+    add_pdf_header(out_pdf);
+    add_obj_pages_catalog(out_pdf);
+    add_obj_page_dictionary(out_pdf);
+
 }
 
 void pdf_new(struct pdf *out_pdf)
@@ -388,12 +436,15 @@ void pdf_new(struct pdf *out_pdf)
     out_pdf->size = 0;
 }
 
-static void add_pdf_header(struct pdf *out_pdf)
+void pdf_write_title(struct pdf *out_pdf, char *text)
 {
-    const size_t append_size = strlen(pdf_str_header);
-    if (out_pdf->size + append_size >= out_pdf->capacity) {
-        extend_pdf_capacity(out_pdf); 
-    }
-    strcat(out_pdf->raw_data, pdf_str_header);
-    out_pdf->size += append_size;
 }
+
+void pdf_write_text(struct pdf *out_pdf, char *text)
+{
+}
+
+void pdf_export(const struct pdf *pdf, const char *out_dir)
+{
+}
+

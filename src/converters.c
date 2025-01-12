@@ -27,13 +27,8 @@ size_t convert_md_to_pdf(const struct mapped_file *md, char **out_data)
     // TODO: each of these objects should be
     // properly inserted into the PDF
     // in any order
-    add_obj_catalog(&out_pdf);
-    add_obj_pages_catalog(&out_pdf);
-    add_obj_page_dictionary(&out_pdf);
-    add_obj_text_stream(&out_pdf);
-    add_obj_font_dictionary(&out_pdf);
-
-    make_valid(&out_pdf);
+    pdf_write_title(&out_pdf, "Test");
+    pdf_write_text(&out_pdf, "lorem ipsum\n");
 
     delete_md_parse_results(&parse_res);
     return 0;
