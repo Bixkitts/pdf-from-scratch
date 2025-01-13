@@ -23,43 +23,41 @@ static int extend_pdf_capacity(struct pdf *out_pdf);
 const char *obsraj         = "0000000000 65535 f";
 const char *pdf_str_header = "%PDF-2.0\nTEST\n";
 const char *pdf_str_metadata[] = {
-    "7 0 obj\n", // %Document metadata
-    "<<",
-    "/Type /Metadata\n",
-    "/Subtype /XML\n",
-    "/Length … number of bytes in metadata …\n",
-    ">>\n",
-    "stream\n",
-    "<?xpacket begin=\"… UTF-8 value of U+FEFF (efbbbf) …\" ",
+    /*obj num*/"0 obj\n"
+    "<<"
+    "/Type /Metadata\n"
+    "/Subtype /XML\n"
+    "/Length " /*num of bytes in metadata\n*/,
+
+    ">>\n"
+    "stream\n"
+    "<?xpacket begin="/*Some other parameter*/,
+
     "id=\"W5M0MpCehiHzreSzNTczkc9d\"?>\n",
-    "… document metadata …\n",
-    "<?xpacket end=\"w\"?>\n",
-    "endstream\n",
-    "endobj\n",
+    /*Document metadata*/
+
+    "<?xpacket end=\"w\"?>\n"
+    "endstream\n"
+    "endobj\n" };
+const char *pdf_str_xref[] = {
+    "xref\n",
+    "0 "/*total number of objects then newline*/,
+
+    /*variable: objsraj*/
+    /*"BYTE_OFFSET 00000 n\n"*/
+    /*"BYTE_OFFSET 00000 n\n"*/
+    /*"BYTE_OFFSET 00000 n\n"*/
+    /*...*/
 };
-const char *pdf_str_xref =
-    "xref\n"
-    "0 8\n"
-    "… Note that the 10 digit byte offsets here must be recalculated by the "
-    "software producing the PDF …\n"
-    "… and that the entries must each occupy 20 bytes including white-space …\n"
-    "0000000000 65536 f\n"
-    "0000000017 00000 n\n"
-    "… byte offset for object 2, exactly 10 digits … 00000 n\n"
-    "… byte offset for object 3, exactly 10 digits … 00000 n\n"
-    "0000000848 00000 n\n"
-    "0000002452 00000 n\n"
-    "… byte offset for object 6, exactly 10 digits … 00000 n\n"
-    "0000003309 00000 n\n";
 const char *pdf_str_trailer =
     "trailer\n"
     "<</Size 8 /Root 1 0 R>>\n";
 const char *pdf_str_xref_start =
     "startxref\n"
-    "… exact offset of the word xref from the start of the file …\n";
+    /*… exact offset of the word xref from the start of the file …\n*/;
 const char *pdf_str_footer = "%%EOF\n";
 const char *pdf_str_font_1 =
-    "5 0 obj\n" // %Font dictionary (Helvetica)
+    /*obj num*/" 0 obj\n"
     "<<"
     "/Type /Font\n"
     "/Subtype /Type1\n"
@@ -72,7 +70,7 @@ const char *pdf_str_font_1 =
     ">>\n"
     "endobj\n";
 const char *pdf_str_font_2 =
-    "6 0 obj\n" // %Font dictionary (Helvetica-Oblique)
+    /*obj num*/" 0 obj\n"
     "<<"
     "/Type /Font\n"
     "/Subtype /Type1\n"
@@ -84,45 +82,58 @@ const char *pdf_str_font_2 =
     "/FontDescriptor \n"
     ">>\n"
     "endobj\n";
-const char *pdf_str_catalog =
-    "1 0 obj\n" // Catalog (root) object to locate everything else
+const char *pdf_str_catalog[] = {
+    /*obj num*/" 0 obj\n" // Catalog (root) object to locate everything else
     "<<"
     "/Type /Catalog\n"
-    "/Pages 2 0 R\n"
-    "/Metadata 7 0 R\n"
+    "/Pages ",
+
+    " 0 R\n"
+    "/Metadata "/*obj num*/,
+
+    " 0 R\n"
     ">>\n"
-    "endobj\n";
-const char *pdf_str_catalog_pages =
-    "2 0 obj\n" // Pages catalog, containing a single page
+    "endobj\n"};
+const char *pdf_str_catalog_pages[] = {
+    /*obj num*/" 0 obj\n" // Pages catalog, containing a single page
     "<<"
     "/Type /Pages\n"
-    "/Kids [3 0 R]\n"
+    "/Kids ["/*obj num*/,
+
+    " 0 R]\n"
     "/Count 1\n"
     ">>\n"
-    "endobj\n";
+    "endobj\n" };
 const char *pdf_str_pages[] = {
-    "3 0 obj\n", // %Page dictionary
-    "<<",
+    /*obj num*/" 0 obj\n"
+    "<<"
     "/Type /Page\n"
-    "/Parent 2 0 R\n"
+    "/Parent "/*obj num*/,
+
+    " 0 R\n"
     "/MediaBox [0 0 612 792]\n"
-    "/Contents 4 0 R\n"
+    "/Contents "/*obj num*/,
+
+    " 0 R\n"
     "/Resources "
     "<<"
     "/Font "
     "<<"
-    "/F1 5 0 R\n" // %Internal ref, not font name
-    "/F2 6 0 R\n" // %Internal ref, not font name
+    "/F1 "/*obj num of font*/,
+
+    " 0 R\n"
     ">>\n"
-    ">>\n",
-    ">>\n",
-    "endobj\n"};
+    ">>\n"
+    ">>\n"
+    "endobj\n" };
 const char *pdf_str_page_content[] = {
-    "4 0 obj\n" // %Page contents for page 1
+    /*obj num*/" 0 obj\n" // %Page contents for page 1
     "<<"
-    "/Length {{{contentLength}}}", // TODO paste stream length here, idiot!
+    "/Length "/*stream length*/,
+
     "\n>>\n"
     "stream\n",
+
     /*"%This content stream writes \"Hello 32000-2 World\" and shows a number
     of\n"
     "%points of interest.\n"
@@ -152,6 +163,7 @@ const char *pdf_str_page_content[] = {
     "221.4 694.2 l\n" // %Set path to end of line position
     "1.2 w\n"         // %Set line width suitable for size of text
     "S\n",            // %Stroke path
+
     "endstream\n"
     "endobj\n"};
 
@@ -381,7 +393,7 @@ static void concat_pdf(struct pdf *out_pdf, const char *data, size_t data_size)
     if (can_fit(out_pdf, data_size)) {
         extend_pdf_capacity(out_pdf); 
     }
-    strcat(out_pdf->raw_data, pdf_str_header);
+    memcpy(out_pdf->raw_data + out_pdf->size, data, data_size);
     out_pdf->size += data_size;
 }
 
@@ -401,8 +413,8 @@ static void add_obj_font_dictionary(struct pdf *out_pdf)
 
 static void add_obj_catalog(struct pdf *out_pdf)
 {
-    const size_t append_size = strlen(pdf_str_catalog);
-    concat_pdf(out_pdf, pdf_str_catalog, append_size);
+    const size_t append_size = strlen(pdf_str_catalog[0]);
+    concat_pdf(out_pdf, pdf_str_catalog[0], append_size);
 }
 
 static void add_obj_pages_catalog(struct pdf *out_pdf)
