@@ -13,17 +13,18 @@ struct pdf_obj {
 static inline int can_fit(const struct pdf *pdf, size_t size);
 static void concat_pdf(struct pdf *out_pdf, const char *data, size_t size);
 static void add_pdf_header(struct pdf *out_pdf);
-static void add_obj_font_dictionary(struct pdf *out_pdf);
+static void add_obj_font(struct pdf *out_pdf);
 static void add_obj_catalog(struct pdf *out_pdf);
-static void add_obj_pages_catalog(struct pdf *out_pdf);
-static void add_obj_page_dictionary(struct pdf *out_pdf);
+static void add_obj_catalog_pages(struct pdf *out_pdf);
+static void add_obj_page(struct pdf *out_pdf);
+static void add_obj_metadata(struct pdf *out_pdf);
 static void make_valid(struct pdf *out_pdf);
 static int extend_pdf_capacity(struct pdf *out_pdf);
 
-const char *obsraj         = "0000000000 65535 f";
+const char *obsraj         = "\n0000000000 65535 f";
 const char *pdf_str_header = "%PDF-2.0\nTEST\n";
 const char *pdf_str_metadata[] = {
-    /*obj num*/"0 obj\n"
+    /*obj num*/" 0 obj\n"
     "<<"
     "/Type /Metadata\n"
     "/Subtype /XML\n"
@@ -86,10 +87,10 @@ const char *pdf_str_catalog[] = {
     /*obj num*/" 0 obj\n" // Catalog (root) object to locate everything else
     "<<"
     "/Type /Catalog\n"
-    "/Pages ",
+    "/Pages " /*pages catalog obj number*/,
 
     " 0 R\n"
-    "/Metadata "/*obj num*/,
+    "/Metadata "/*metadata obj num*/,
 
     " 0 R\n"
     ">>\n"
@@ -104,11 +105,11 @@ const char *pdf_str_catalog_pages[] = {
     "/Count 1\n"
     ">>\n"
     "endobj\n" };
-const char *pdf_str_pages[] = {
+const char *pdf_str_page[] = {
     /*obj num*/" 0 obj\n"
     "<<"
     "/Type /Page\n"
-    "/Parent "/*obj num*/,
+    "/Parent "/*page catalog obj num*/,
 
     " 0 R\n"
     "/MediaBox [0 0 612 792]\n"
@@ -167,11 +168,22 @@ const char *pdf_str_page_content[] = {
     "endstream\n"
     "endobj\n"};
 
+/* 
+ * Hardcoded object number strings
+ * TODO: replace this with flexible numbering
+ */
+const char *catalog_obj_num = "1";
+const char *page_catalog_obj_num = "2";
+const char *metadata_obj_num = "3";
+const char *test_page_obj_num = "4";
+const char *page_content_obj_num = "5";
+const char *font_obj_num = "6";
+
 
 static int extend_pdf_capacity(struct pdf *out_pdf)
 {
     if (!out_pdf->capacity) {
-        out_pdf->raw_data     = cooler_calloc(PDF_MINIMUM_CAPACITY, sizeof(char));
+        out_pdf->raw_data = cooler_calloc(PDF_MINIMUM_CAPACITY, sizeof(char));
         out_pdf->capacity = PDF_MINIMUM_CAPACITY;
     }
     else {
@@ -180,17 +192,17 @@ static int extend_pdf_capacity(struct pdf *out_pdf)
             cooler_realloc(out_pdf->raw_data, new_size);
         out_pdf->capacity = new_size;
     }
-    return !out_pdf->raw_data;
+    return 0;
 }
 
-size_t get_obj_length(const char *obj_strarr[], size_t len, size_t lengths[])
+size_t get_obj_length(const char *obj_strarr[], size_t len, size_t *out_lengths)
 {
     size_t totalLength = 0;
     for (size_t i = 0; i < len; i++) {
         size_t clen = strlen(obj_strarr[i]);
         totalLength += clen;
-        if (lengths)
-            lengths[i] = clen;
+        if (out_lengths)
+            out_lengths[i] = clen;
     }
     return totalLength;
 }
@@ -388,9 +400,13 @@ static inline int can_fit(const struct pdf *pdf, size_t size)
     return pdf->size + size >= pdf->capacity;
 }
 
+/*
+ * We calculate the size outside of this
+ * function because it could also be binary data
+ */
 static void concat_pdf(struct pdf *out_pdf, const char *data, size_t data_size)
 {
-    if (can_fit(out_pdf, data_size)) {
+    if (!can_fit(out_pdf, data_size)) {
         extend_pdf_capacity(out_pdf); 
     }
     memcpy(out_pdf->raw_data + out_pdf->size, data, data_size);
@@ -403,30 +419,84 @@ static void add_pdf_header(struct pdf *out_pdf)
     concat_pdf(out_pdf, pdf_str_header, append_size);
 }
 
-static void add_obj_text_stream(struct pdf *out_pdf)
+static void add_obj_text_stream(struct pdf *out_pdf, const char *text)
 {
+    out_pdf->object_count++;
 }
 
-static void add_obj_font_dictionary(struct pdf *out_pdf)
+static void add_obj_font(struct pdf *out_pdf)
 {
+    out_pdf->object_count++;
+}
+
+static void add_obj_metadata(struct pdf *out_pdf)
+{
+    out_pdf->object_count++;
+
 }
 
 static void add_obj_catalog(struct pdf *out_pdf)
 {
-    const size_t append_size = strlen(pdf_str_catalog[0]);
+    out_pdf->object_count++;
+    size_t append_size = strlen(catalog_obj_num);
+    concat_pdf(out_pdf, catalog_obj_num, append_size);
+
+    append_size = strlen(pdf_str_catalog[0]);
     concat_pdf(out_pdf, pdf_str_catalog[0], append_size);
+
+    append_size = strlen(page_catalog_obj_num);
+    concat_pdf(out_pdf, page_catalog_obj_num, append_size);
+
+    append_size = strlen(pdf_str_catalog[1]);
+    concat_pdf(out_pdf, pdf_str_catalog[1], append_size);
+
+    append_size = strlen(metadata_obj_num);
+    concat_pdf(out_pdf, metadata_obj_num, append_size);
+
+    append_size = strlen(pdf_str_catalog[2]);
+    concat_pdf(out_pdf, pdf_str_catalog[2], append_size);
 }
 
-static void add_obj_pages_catalog(struct pdf *out_pdf)
+static void add_obj_catalog_pages(struct pdf *out_pdf)
 {
-    const size_t append_size = strlen(pdf_str_catalog_pages);
-    concat_pdf(out_pdf, pdf_str_catalog_pages, append_size);
+    out_pdf->object_count++;
+    size_t append_size = strlen(page_catalog_obj_num);
+    concat_pdf(out_pdf, page_catalog_obj_num, append_size);
+
+    append_size = strlen(pdf_str_catalog_pages[0]);
+    concat_pdf(out_pdf, pdf_str_catalog_pages[0], append_size);
+
+    // Here we link pages!
+    append_size = strlen(test_page_obj_num);
+    concat_pdf(out_pdf, test_page_obj_num, append_size);
+
+    append_size = strlen(pdf_str_catalog_pages[1]);
+    concat_pdf(out_pdf, pdf_str_catalog_pages[1], append_size);
 }
 
-static void add_obj_page_dictionary(struct pdf *out_pdf)
+static void add_obj_page(struct pdf *out_pdf)
 {
-    const size_t append_size = strlen(pdf_str_page_);
-    concat_pdf(out_pdf, pdf_str_catalog_pages, append_size);
+    out_pdf->object_count++;
+    size_t append_size = strlen(test_page_obj_num);
+    concat_pdf(out_pdf, test_page_obj_num, append_size);
+
+    append_size = strlen(pdf_str_page[0]);
+    concat_pdf(out_pdf, pdf_str_page[0], append_size);
+
+    append_size = strlen(page_catalog_obj_num);
+    concat_pdf(out_pdf, page_catalog_obj_num, append_size);
+
+    append_size = strlen(pdf_str_page[1]);
+    concat_pdf(out_pdf, pdf_str_page[1], append_size);
+
+    append_size = strlen(page_content_obj_num);
+    concat_pdf(out_pdf, page_content_obj_num, append_size);
+
+    append_size = strlen(pdf_str_page[2]);
+    concat_pdf(out_pdf, pdf_str_page[2], append_size);
+
+    append_size = strlen(font_obj_num);
+    concat_pdf(out_pdf, page_content_obj_num, append_size);
 }
 
 /*
@@ -436,14 +506,18 @@ static void add_obj_page_dictionary(struct pdf *out_pdf)
 static void add_scaffolding(struct pdf *out_pdf)
 {
     add_pdf_header(out_pdf);
-    add_obj_pages_catalog(out_pdf);
-    add_obj_page_dictionary(out_pdf);
+    add_obj_catalog(out_pdf);
+    add_obj_catalog_pages(out_pdf);
+    add_obj_metadata(out_pdf);
+    add_obj_page(out_pdf);
+    add_obj_font(out_pdf);
 
 }
 
 void pdf_new(struct pdf *out_pdf)
 {
     out_pdf->raw_data = cooler_calloc(PDF_MINIMUM_CAPACITY, sizeof(char));
+    out_pdf->object_count = 0; // pdf object zero should not be used!
     out_pdf->capacity = PDF_MINIMUM_CAPACITY;
     out_pdf->size = 0;
 }
